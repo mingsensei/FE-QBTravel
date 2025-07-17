@@ -131,8 +131,8 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-nature p-4">
-      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+      <div className="min-h-screen bg-gradient-nature p-4 pt-24">
+  <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
         {/* Header Card */}
         <Card className="shadow-card bg-gradient-card border-border/50">
           <CardHeader className="pb-4">
