@@ -1,0 +1,57 @@
+.map-container {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Marker giống HTML mẫu */
+.marker {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.marker img {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease-in-out;
+}
+
+.marker img:hover {
+  transform: scale(1.1);
+}
+
+/* Popup đẹp */
+.custom-popup .mapboxgl-popup-content {
+  text-align: center;
+  font-family: "Open Sans", sans-serif;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background-color: #fff;
+  color: #333;
+  max-width: 250px;
+}
+
+.custom-popup .mapboxgl-popup-content h3 {
+  margin-top: 0;
+  margin-bottom: 5px;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.custom-popup .mapboxgl-popup-content p {
+  margin: 0 0 5px;
+  font-size: 0.9em;
+}
+
+.custom-popup .mapboxgl-popup-content small {
+  font-size: 0.8em;
+  color: #666;
+}
+
+.custom-popup .mapboxgl-popup-tip {
+  display: none;
+}
