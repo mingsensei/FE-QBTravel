@@ -10,6 +10,7 @@ import UserProfile  from "./components/user/UserProfile.tsx";
 import {DestinationBlog} from "@/components/DestinationBlog.tsx";
 import {QuangBinhProducts} from "@/components/QuangBinhProducts.tsx";
 import Homepage from "@/components/Homepage.tsx";
+import {ThreeDMap} from "@/components/ThreeMap.tsx";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,8 @@ const App = () => (
               <Route path="/user" element={<UserProfile />} />
               <Route path="/destination-blog" element={<DestinationBlog />} />
               <Route path="/products" element={<QuangBinhProducts/>}/>
+              <Route path="/map" element={<ThreeDMap/>}/>
+
             </Route>
             <Route path="/login" element={<LoginRegister />} />
             <Route path="*" element={<NotFound />} />
