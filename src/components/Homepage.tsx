@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Play, Heart, MessageCircle, Share2, X, ChevronLeft, ChevronRight, MapPin, Star, Clock } from 'lucide-react';
 import { Button } from './ui/button';
+import { VideoFeed } from './VideoFeed';
 
 const Homepage = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [showVideoFeed, setShowVideoFeed] = useState(false);
 
   const famousPlaces = [
     {
@@ -99,22 +101,27 @@ const Homepage = () => {
     }
   ];
 
-  const openVideo = (video, index) => {
-    setSelectedVideo(video);
-    setCurrentVideoIndex(index);
+  const openVideoFeed = () => {
+    setShowVideoFeed(true);
   };
 
-  const nextVideo = () => {
-    const nextIndex = (currentVideoIndex + 1) % travelVideos.length;
-    setSelectedVideo(travelVideos[nextIndex]);
-    setCurrentVideoIndex(nextIndex);
+  const closeVideoFeed = () => {
+    setShowVideoFeed(false);
   };
 
-  const prevVideo = () => {
-    const prevIndex = currentVideoIndex === 0 ? travelVideos.length - 1 : currentVideoIndex - 1;
-    setSelectedVideo(travelVideos[prevIndex]);
-    setCurrentVideoIndex(prevIndex);
-  };
+  if (showVideoFeed) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black">
+        <button
+          onClick={closeVideoFeed}
+          className="absolute top-4 right-4 z-50 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
+        >
+          <X className="w-6 h-6" />
+        </button>
+        <VideoFeed />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -188,15 +195,15 @@ const Homepage = () => {
         </div>
       </section>
 
-      {/* Travel Videos Section */}
+      {/* Video Stories Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Travel Stories
+              Video Stories
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Watch inspiring travel videos and get ready for your next adventure
+              Watch inspiring travel videos and immerse yourself in the beauty of Quang Binh
             </p>
           </div>
 
@@ -205,7 +212,7 @@ const Homepage = () => {
               <div 
                 key={video.id}
                 className="group cursor-pointer"
-                onClick={() => openVideo(video, index)}
+                onClick={openVideoFeed}
               >
                 <div className="relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                   <img 
@@ -228,68 +235,17 @@ const Homepage = () => {
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Video Modal */}
-      {selectedVideo && (
-        <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
-          <div className="relative w-full h-full max-w-md mx-auto">
-            {/* Video Player */}
-            <div className="relative h-full bg-black flex items-center justify-center">
-              <img 
-                src={selectedVideo.thumbnail} 
-                alt={selectedVideo.title}
-                className="w-full h-full object-cover"
-              />
-              
-              {/* Close Button */}
-              <button 
-                onClick={() => setSelectedVideo(null)}
-                className="absolute top-4 right-4 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors z-10"
-              >
-                <X className="w-6 h-6" />
-              </button>
-
-              {/* Navigation Arrows */}
-              <button 
-                onClick={prevVideo}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button 
-                onClick={nextVideo}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
-
-              {/* Video Info Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent text-white">
-                <h3 className="text-lg font-bold mb-2">{selectedVideo.title}</h3>
-                <p className="text-gray-300 mb-4">{selectedVideo.author}</p>
-                
-                {/* Action Buttons */}
-                <div className="flex items-center space-x-6">
-                  <button className="flex items-center space-x-2 hover:text-red-400 transition-colors">
-                    <Heart className="w-6 h-6" />
-                    <span className="text-sm">{selectedVideo.likes}</span>
-                  </button>
-                  <button className="flex items-center space-x-2 hover:text-blue-400 transition-colors">
-                    <MessageCircle className="w-6 h-6" />
-                    <span className="text-sm">{selectedVideo.comments}</span>
-                  </button>
-                  <button className="flex items-center space-x-2 hover:text-green-400 transition-colors">
-                    <Share2 className="w-6 h-6" />
-                    <span className="text-sm">Share</span>
-                  </button>
-                </div>
-              </div>
-            </div>
+          <div className="text-center mt-8">
+            <Button 
+              onClick={openVideoFeed}
+              className="bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              Watch More Stories
+            </Button>
           </div>
         </div>
-      )}
+      </section>
     </div>
   );
 };
