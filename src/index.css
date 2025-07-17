@@ -6,46 +6,50 @@
 
 @layer base {
   :root {
-    /* Base colors */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
+    --border: 147 20% 88%;
+    --background: 147 20% 97%;
+    --foreground: 147 25% 15%;
 
-    /* Card colors */
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 147 25% 15%;
 
-    /* Popover colors */
-    --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 147 25% 15%;
+    --bg-background: 147 60% 45%;
+    --text-foreground: 0 0% 100%;
 
     /* Tourism brand colors - Green theme */
-    --primary: 142 76% 36%;
+    --primary: 147 60% 45%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 142 76% 46%;
+    --primary-glow: 147 50% 55%;
     --tourism-green: 142 76% 36%;
     --tourism-green-light: 142 76% 46%;
     --tourism-green-dark: 142 76% 26%;
 
+    /* Travel-themed gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-nature: linear-gradient(180deg, hsl(147 40% 85%), hsl(147 30% 90%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(147 10% 98%));
+
     /* Secondary colors */
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 90%;
+    --secondary: 147 20% 92%;
+    --secondary-foreground: 147 25% 25%;
 
     /* Muted colors */
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 147 15% 95%;
+    --muted-foreground: 147 10% 45%;
 
     /* Accent colors */
-    --accent: 0 100% 60%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 147 30% 85%;
+    --accent-foreground: 147 25% 25%;
 
     /* Destructive colors */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
 
     /* Border and input */
-    --border: 0 0% 15%;
-    --input: 0 0% 12%;
-    --ring: 262 83% 58%;
+    --input: 147 15% 92%;
+    --ring: 147 60% 45%;
 
     /* Social media specific colors */
     --like-color: 0 100% 60%;
@@ -54,11 +58,12 @@
 
     /* Gradients */
     --gradient-overlay: linear-gradient(to top, hsl(0 0% 0% / 0.8), transparent);
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.1), hsl(0 0% 100% / 0.05));
 
     /* Shadows */
-    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.3);
+    --shadow-soft: 0 4px 20px -2px hsl(var(--primary) / 0.1);
+    --shadow-card: 0 10px 40px -10px hsl(var(--primary) / 0.15);
+    --shadow-glow: 0 0 30px hsl(var(--primary-glow) / 0.3);
     --shadow-glass: 0 8px 32px hsl(0 0% 0% / 0.3);
     --shadow-button: 0 4px 12px hsl(0 0% 0% / 0.4);
 
@@ -66,22 +71,15 @@
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-    --radius: 1rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -113,6 +111,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -123,7 +122,6 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
-
 @layer base {
   * {
     @apply border-border;
