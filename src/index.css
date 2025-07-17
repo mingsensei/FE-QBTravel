@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Modern Social Media Design System - All colors MUST be HSL */
+/* Tourism Design System - Quang Binh Travel Map - All colors MUST be HSL */
 
 @layer base {
   :root {
@@ -18,10 +18,13 @@
     --popover: 0 0% 8%;
     --popover-foreground: 0 0% 95%;
 
-    /* Brand colors */
-    --primary: 262 83% 58%;
+    /* Tourism brand colors - Green theme */
+    --primary: 142 76% 36%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 270 100% 70%;
+    --primary-glow: 142 76% 46%;
+    --tourism-green: 142 76% 36%;
+    --tourism-green-light: 142 76% 46%;
+    --tourism-green-dark: 142 76% 26%;
 
     /* Secondary colors */
     --secondary: 0 0% 12%;
