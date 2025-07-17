@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, MapPin, Calendar, Utensils, Camera, Info, Phone, Home } from 'lucide-react';
 import { Button } from './ui/button';
+import LoginRegister from './LoginRegister';
+import { useNavigate } from 'react-router-dom';
 
 const TourismHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,7 +67,7 @@ const TourismHeader = () => {
 
           {/* CTA Button & Mobile Menu Toggle */}
           <div className="flex items-center space-x-4">
-            <Button className="hidden sm:flex bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <Button className="hidden sm:flex bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={() => navigate('/login')}>
               Plan Your Trip
             </Button>
             
@@ -94,7 +97,7 @@ const TourismHeader = () => {
                 </a>
               ))}
               <div className="px-4 pt-4">
-                <Button className="w-full bg-gradient-to-r from-primary to-primary-glow text-white font-semibold py-3 rounded-full shadow-lg">
+                <Button className="w-full bg-gradient-to-r from-primary to-primary-glow text-white font-semibold py-3 rounded-full shadow-lg" onClick={() => { setIsMobileMenuOpen(false); navigate('/login'); }}>
                   Plan Your Trip
                 </Button>
               </div>
