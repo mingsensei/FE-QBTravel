@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainLayout from "./pages/MainLayout.tsx";
 import NotFound from "./pages/NotFound";
 import LoginRegister from "./components/LoginRegister";
+import MapPage from "./pages/MapPage";
 import UserProfile  from "./components/user/UserProfile.tsx";
 import {DestinationBlog} from "@/components/DestinationBlog.tsx";
 import {QuangBinhProducts} from "@/components/QuangBinhProducts.tsx";
@@ -23,6 +24,7 @@ const App = () => (
             <Route element={<MainLayout />}>
               <Route path="/" element={<Homepage />} />
               <Route path="/user" element={<UserProfile />} />
+              <Route path="/map" element={<MapPage />} />
               <Route path="/destination-blog" element={<DestinationBlog />} />
               <Route path="/products" element={<QuangBinhProducts/>}/>
             </Route>
