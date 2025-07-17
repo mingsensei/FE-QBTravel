@@ -153,7 +153,7 @@ const UserProfile = () => {
               {/* User Info */}
               <div className="flex-1 space-y-3">
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground">{userData.name}</h1>
+                  <h1 className="text-2xl font-bold text-primary">{userData.name}</h1>
                   <div className="flex items-center gap-2 text-muted-foreground mt-1">
                     <Mail className="h-4 w-4" />
                     <span className="text-sm">{userData.email}</span>
@@ -191,7 +191,7 @@ const UserProfile = () => {
 
               {/* Edit Button */}
               <Button 
-                variant="travel" 
+                variant="default"
                 className="self-start"
                 onClick={() => setShowEditProfile(true)}
               >

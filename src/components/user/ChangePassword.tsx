@@ -253,7 +253,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onSave, onCancel }) => 
             <div className="flex gap-3 pt-4">
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 onClick={onCancel}
                 className="flex-1"
                 disabled={isSubmitting}
@@ -262,7 +262,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onSave, onCancel }) => 
               </Button>
               <Button 
                 type="submit" 
-                variant="travel"
+                variant="link"
                 className="flex-1 font-medium"
                 disabled={isSubmitting || !passwordValidation.isValid}
               >

@@ -331,7 +331,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ userData, onSave, onCancel })
               </Button>
               <Button 
                 type="submit" 
-                variant="travel"
+                variant="default"
                 className="flex-1 font-medium"
                 disabled={isSubmitting}
               >
