@@ -8,8 +8,7 @@ import NotFound from "./pages/NotFound";
 import LoginRegister from "./components/LoginRegister";
 import UserProfile  from "./components/user/UserProfile.tsx";
 import {DestinationBlog} from "@/components/DestinationBlog.tsx";
-
-
+import {QuangBinhProducts} from "@/components/QuangBinhProducts.tsx";
 import Homepage from "@/components/Homepage.tsx";
 
 const queryClient = new QueryClient();
@@ -25,6 +24,7 @@ const App = () => (
               <Route path="/" element={<Homepage />} />
               <Route path="/user" element={<UserProfile />} />
               <Route path="/destination-blog" element={<DestinationBlog />} />
+              <Route path="/products" element={<QuangBinhProducts/>}/>
             </Route>
             <Route path="/login" element={<LoginRegister />} />
             <Route path="*" element={<NotFound />} />
