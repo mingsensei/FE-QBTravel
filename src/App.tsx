@@ -24,8 +24,7 @@ const App = () => (
           <Routes>
             <Route element={<MainLayout />}>
               <Route path="/" element={<Homepage />} />
-              <Route path="/user" element={<UserProfile />} />
-              <Route path="/map" element={<MapPage />} />
+              <Route path="/user" element={<UserProfile />} />g
               <Route path="/destination-blog" element={<DestinationBlog />} />
               <Route path="/products" element={<QuangBinhProducts/>}/>
               <Route path="/map" element={<ThreeDMap/>}/>
