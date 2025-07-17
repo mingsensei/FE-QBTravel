@@ -190,206 +190,238 @@ const VideoItem: React.FC<VideoItemProps> = ({
   };
 
   return (
-    <div className="relative w-full h-screen snap-start snap-always flex">
-      {/* Video Container */}
-      <div className={`relative transition-all duration-500 ease-in-out ${
-        showComments ? 'w-2/3' : 'w-full'
-      } h-full`}>
-        {/* Video Player */}
-        <video
-          ref={videoRef}
-          className="w-full h-full object-cover bg-black"
-          loop
-          muted={isMuted}
-          playsInline
-          onClick={togglePlayPause}
-          poster={`https://picsum.photos/400/800?random=${video.id}`}
-        >
-          <source src={video.url} type="video/mp4" />
-          {/* Fallback for demo */}
-          <div className="w-full h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-            <div className="text-center text-white">
-              <div className="text-6xl mb-4">🎬</div>
-              <p className="text-lg opacity-80">Video {video.id}</p>
+    <div className="relative w-full h-screen snap-start snap-always flex items-center justify-center bg-black">
+      {/* Main Content Container */}
+      <div className={`flex items-center justify-center h-full transition-all duration-500 ease-in-out ${
+        showComments ? 'w-full max-w-7xl' : 'w-full'
+      }`}>
+        
+        {/* Video Container - Always 16:9 aspect ratio */}
+        <div className={`relative transition-all duration-500 ease-in-out ${
+          showComments 
+            ? 'w-2/3 max-w-4xl' // When comments are shown, video takes 2/3 of container
+            : 'w-full max-w-6xl' // When no comments, video can be larger but still centered
+        }`}>
+          {/* 16:9 Aspect Ratio Container */}
+          <div className="relative w-full" style={{ paddingBottom: '56.25%' /* 16:9 aspect ratio */ }}>
+            {/* Video Player */}
+            <video
+              ref={videoRef}
+              className="absolute inset-0 w-full h-full object-cover bg-black rounded-lg"
+              loop
+              muted={isMuted}
+              playsInline
+              onClick={togglePlayPause}
+              poster={`https://picsum.photos/1920/1080?random=${video.id}`}
+            >
+              <source src={video.url} type="video/mp4" />
+              {/* Fallback for demo */}
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center rounded-lg">
+                <div className="text-center text-white">
+                  <div className="text-6xl mb-4">🎬</div>
+                  <p className="text-lg opacity-80">Video {video.id}</p>
+                </div>
+              </div>
+            </video>
+
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 gradient-overlay pointer-events-none rounded-lg" />
+
+            {/* Top User Info */}
+            <div className="absolute top-4 left-4 flex items-center space-x-3 z-10">
+              <div className="relative">
+                <img
+                  src={video.user.avatar}
+                  alt={video.user.username}
+                  className="w-12 h-12 rounded-full border-2 border-white/30 shadow-lg"
+                />
+                {video.user.verified && (
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-2 border-white">
+                    <div className="w-2 h-2 bg-white rounded-full" />
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center space-x-2">
+                  <span className="text-white font-semibold text-sm">@{video.user.username}</span>
+                  <span className="text-white/60 text-xs">•</span>
+                  <span className="text-white/60 text-xs">{video.timestamp}</span>
+                </div>
+                <span className="text-white/80 text-xs">Follow</span>
+              </div>
             </div>
-          </div>
-        </video>
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 gradient-overlay pointer-events-none" />
+            {/* Video Description */}
+            <div className="absolute bottom-4 left-4 right-4 z-10">
+              <p className="text-white text-sm leading-relaxed drop-shadow-lg">
+                {video.description}
+              </p>
+            </div>
 
-        {/* Top User Info */}
-        <div className="absolute top-16 left-4 flex items-center space-x-3 z-10">
-          <div className="relative">
-            <img
-              src={video.user.avatar}
-              alt={video.user.username}
-              className="w-12 h-12 rounded-full border-2 border-white/30 shadow-lg"
-            />
-            {video.user.verified && (
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-2 border-white">
-                <div className="w-2 h-2 bg-white rounded-full" />
+            {/* Action Buttons - Only show when comments are closed */}
+            {!showComments && (
+              <div className="absolute right-4 bottom-4 flex flex-col space-y-6 z-10">
+                {/* Like Button */}
+                <div className="flex flex-col items-center space-y-1">
+                  <button
+                    onClick={() => onToggleLike(video.id)}
+                    className={`action-btn w-12 h-12 rounded-full btn-glass flex items-center justify-center ${
+                      video.isLiked ? 'text-like' : 'text-white'
+                    }`}
+                  >
+                    <Heart 
+                      className={`w-7 h-7 ${video.isLiked ? 'fill-current' : ''}`} 
+                    />
+                  </button>
+                  <span className="text-white text-xs font-medium">
+                    {video.likes > 999 ? `${(video.likes / 1000).toFixed(1)}k` : video.likes}
+                  </span>
+                </div>
+
+                {/* Comment Button */}
+                <div className="flex flex-col items-center space-y-1">
+                  <button
+                    onClick={() => onOpenComments(video)}
+                    className="action-btn w-12 h-12 rounded-full btn-glass flex items-center justify-center text-white"
+                  >
+                    <MessageCircle className="w-7 h-7" />
+                  </button>
+                  <span className="text-white text-xs font-medium">
+                    {video.comments > 999 ? `${(video.comments / 1000).toFixed(1)}k` : video.comments}
+                  </span>
+                </div>
+
+                {/* Share Button */}
+                <div className="flex flex-col items-center space-y-1">
+                  <button
+                    onClick={() => onShare(video.id)}
+                    className="action-btn w-12 h-12 rounded-full btn-glass flex items-center justify-center text-white"
+                  >
+                    <Share className="w-7 h-7" />
+                  </button>
+                  <span className="text-white text-xs font-medium">
+                    {video.shares > 999 ? `${(video.shares / 1000).toFixed(1)}k` : video.shares}
+                  </span>
+                </div>
+
+                {/* More Options */}
+                <button className="action-btn w-12 h-12 rounded-full btn-glass flex items-center justify-center text-white">
+                  <MoreVertical className="w-6 h-6" />
+                </button>
+              </div>
+            )}
+
+            {/* Volume Control */}
+            <button
+              onClick={toggleMute}
+              className="absolute top-4 right-4 w-10 h-10 rounded-full btn-glass flex items-center justify-center text-white z-10"
+            >
+              {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            </button>
+
+            {/* Play/Pause Indicator */}
+            {!isPlaying && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1" />
+                </div>
               </div>
             )}
           </div>
-          <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
-              <span className="text-white font-semibold text-sm">@{video.user.username}</span>
-              <span className="text-white/60 text-xs">•</span>
-              <span className="text-white/60 text-xs">{video.timestamp}</span>
-            </div>
-            <span className="text-white/80 text-xs">Follow</span>
-          </div>
         </div>
 
-        {/* Video Description */}
-        <div className={`absolute bottom-24 left-4 z-10 transition-all duration-500 ${
-          showComments ? 'right-4' : 'right-20'
-        }`}>
-          <p className="text-white text-sm leading-relaxed drop-shadow-lg">
-            {video.description}
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        {!showComments && (
-          <div className="absolute right-4 bottom-24 flex flex-col space-y-6 z-10">
-            {/* Like Button */}
-            <div className="flex flex-col items-center space-y-1">
-              <button
-                onClick={() => onToggleLike(video.id)}
-                className={`action-btn w-12 h-12 rounded-full btn-glass flex items-center justify-center ${
-                  video.isLiked ? 'text-like' : 'text-white'
-                }`}
-              >
-                <Heart 
-                  className={`w-7 h-7 ${video.isLiked ? 'fill-current' : ''}`} 
-                />
-              </button>
-              <span className="text-white text-xs font-medium">
-                {video.likes > 999 ? `${(video.likes / 1000).toFixed(1)}k` : video.likes}
-              </span>
-            </div>
-
-            {/* Comment Button */}
-            <div className="flex flex-col items-center space-y-1">
-              <button
-                onClick={() => onOpenComments(video)}
-                className="action-btn w-12 h-12 rounded-full btn-glass flex items-center justify-center text-white"
-              >
-                <MessageCircle className="w-7 h-7" />
-              </button>
-              <span className="text-white text-xs font-medium">
-                {video.comments > 999 ? `${(video.comments / 1000).toFixed(1)}k` : video.comments}
-              </span>
-            </div>
-
-            {/* Share Button */}
-            <div className="flex flex-col items-center space-y-1">
-              <button
-                onClick={() => onShare(video.id)}
-                className="action-btn w-12 h-12 rounded-full btn-glass flex items-center justify-center text-white"
-              >
-                <Share className="w-7 h-7" />
-              </button>
-              <span className="text-white text-xs font-medium">
-                {video.shares > 999 ? `${(video.shares / 1000).toFixed(1)}k` : video.shares}
-              </span>
-            </div>
-
-            {/* More Options */}
-            <button className="action-btn w-12 h-12 rounded-full btn-glass flex items-center justify-center text-white">
-              <MoreVertical className="w-6 h-6" />
-            </button>
-          </div>
-        )}
-
-        {/* Volume Control */}
-        <button
-          onClick={toggleMute}
-          className="absolute top-20 right-4 w-10 h-10 rounded-full btn-glass flex items-center justify-center text-white z-10"
-        >
-          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-        </button>
-
-        {/* Play/Pause Indicator */}
-        {!isPlaying && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1" />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Comments Panel */}
-      <div className={`transition-all duration-500 ease-in-out ${
-        showComments ? 'w-1/3 opacity-100' : 'w-0 opacity-0'
-      } h-full overflow-hidden`}>
-        <div className="h-full glass-panel flex flex-col">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-white/10">
-            <div className="flex items-center space-x-3">
-              <img
-                src={video.user.avatar}
-                alt={video.user.username}
-                className="w-8 h-8 rounded-full"
-              />
-              <div>
-                <h3 className="text-sm font-semibold text-white">
-                  {video.comments} comments
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  @{video.user.username}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={onCloseComments}
-              className="w-8 h-8 rounded-full btn-glass flex items-center justify-center text-white"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Comments List */}
-          <div className="flex-1 overflow-y-auto px-4 py-2">
-            {comments.map((comment) => (
-              <CommentItem
-                key={comment.id}
-                comment={comment}
-                onLike={handleLikeComment}
-              />
-            ))}
-          </div>
-
-          {/* Comment Input */}
-          <div className="p-4 border-t border-white/10">
-            <div className="flex items-center space-x-3">
-              <img
-                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face"
-                alt="You"
-                className="w-8 h-8 rounded-full flex-shrink-0"
-              />
-              <div className="flex-1 flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Add a comment..."
-                  className="flex-1 bg-muted/20 border border-white/10 rounded-full px-4 py-2 text-sm text-white placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
-                  onKeyPress={(e) => e.key === 'Enter' && handleSubmitComment()}
-                />
+        {/* Comments Panel - Right Side */}
+        <div className={`transition-all duration-500 ease-in-out ${
+          showComments ? 'w-1/3 opacity-100 ml-6' : 'w-0 opacity-0 overflow-hidden'
+        } h-full max-h-screen`}>
+          {showComments && (
+            <div className="h-full max-h-[80vh] my-auto glass-panel flex flex-col rounded-lg">
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 border-b border-white/10">
+                <div className="flex items-center space-x-3">
+                  <img
+                    src={video.user.avatar}
+                    alt={video.user.username}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <div>
+                    <h3 className="text-sm font-semibold text-white">
+                      {video.comments} comments
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      @{video.user.username}
+                    </p>
+                  </div>
+                </div>
                 <button
-                  onClick={handleSubmitComment}
-                  disabled={!commentText.trim()}
-                  className="px-4 py-2 bg-primary hover:bg-primary/80 disabled:bg-muted/20 disabled:text-muted-foreground rounded-full text-sm font-medium text-white transition-all duration-200"
+                  onClick={onCloseComments}
+                  className="w-8 h-8 rounded-full btn-glass flex items-center justify-center text-white"
                 >
-                  Post
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Comments List */}
+              <div className="flex-1 overflow-y-auto px-4 py-2 scrollbar-hide">
+                {comments.map((comment) => (
+                  <CommentItem
+                    key={comment.id}
+                    comment={comment}
+                    onLike={handleLikeComment}
+                  />
+                ))}
+              </div>
+
+              {/* Comment Input */}
+              <div className="p-4 border-t border-white/10">
+                <div className="flex items-center space-x-3">
+                  <img
+                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face"
+                    alt="You"
+                    className="w-8 h-8 rounded-full flex-shrink-0"
+                  />
+                  <div className="flex-1 flex items-center space-x-2">
+                    <input
+                      type="text"
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      placeholder="Add a comment..."
+                      className="flex-1 bg-muted/20 border border-white/10 rounded-full px-4 py-2 text-sm text-white placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                      onKeyPress={(e) => e.key === 'Enter' && handleSubmitComment()}
+                    />
+                    <button
+                      onClick={handleSubmitComment}
+                      disabled={!commentText.trim()}
+                      className="px-4 py-2 bg-primary hover:bg-primary/80 disabled:bg-muted/20 disabled:text-muted-foreground rounded-full text-sm font-medium text-white transition-all duration-200"
+                    >
+                      Post
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons in Comments View */}
+              <div className="flex items-center justify-around p-4 border-t border-white/10">
+                <button
+                  onClick={() => onToggleLike(video.id)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full btn-glass ${
+                    video.isLiked ? 'text-like' : 'text-white'
+                  }`}
+                >
+                  <Heart className={`w-5 h-5 ${video.isLiked ? 'fill-current' : ''}`} />
+                  <span className="text-sm">{video.likes > 999 ? `${(video.likes / 1000).toFixed(1)}k` : video.likes}</span>
+                </button>
+                
+                <button
+                  onClick={() => onShare(video.id)}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-full btn-glass text-white"
+                >
+                  <Share className="w-5 h-5" />
+                  <span className="text-sm">{video.shares > 999 ? `${(video.shares / 1000).toFixed(1)}k` : video.shares}</span>
                 </button>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
