@@ -48,6 +48,8 @@ const MapPage: React.FC = () => {
   useEffect(() => {
     if (!mapRef.current) return;
 
+    console.log('MapPage: Initializing map with', allLocations.length, 'locations');
+
     const map = new mapboxgl.Map({
       container: mapRef.current,
       style: 'mapbox://styles/mapbox/standard-satellite',
@@ -56,7 +58,11 @@ const MapPage: React.FC = () => {
     });
 
     map.on('load', () => {
-      allLocations.forEach((location: LocationPoint) => {
+      console.log('MapPage: Map loaded, adding markers');
+      
+      allLocations.forEach((location: LocationPoint, index) => {
+        console.log(`Adding marker ${index + 1}:`, location.name, location.coordinates);
+        
         // Create custom marker element
         const markerEl = createMarkerElement(location);
         
@@ -75,6 +81,7 @@ const MapPage: React.FC = () => {
 
         // Add click event to marker
         markerEl.addEventListener('click', () => {
+          console.log('Marker clicked:', location.name);
           popup.setLngLat(location.coordinates).addTo(map);
         });
 
@@ -87,6 +94,8 @@ const MapPage: React.FC = () => {
           markerEl.classList.remove('marker-hover');
         });
       });
+
+      console.log('MapPage: All markers added successfully');
     });
 
     return () => map.remove();
