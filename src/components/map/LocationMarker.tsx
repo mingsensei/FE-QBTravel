@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { LocationPoint } from '@/types/map';
+import { Html } from '@react-three/drei';
+
 
 interface LocationMarkerProps {
   location: LocationPoint;

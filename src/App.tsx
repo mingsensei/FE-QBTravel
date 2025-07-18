@@ -27,9 +27,10 @@ const App = () => (
               <Route path="/user" element={<UserProfile />} />g
               <Route path="/destination-blog" element={<DestinationBlog />} />
               <Route path="/products" element={<QuangBinhProducts/>}/>
-              <Route path="/map" element={<ThreeDMap/>}/>
+
 
             </Route>
+            <Route path="/map" element={<ThreeDMap/>}/>
             <Route path="/login" element={<LoginRegister />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

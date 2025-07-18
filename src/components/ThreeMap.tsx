@@ -23,7 +23,7 @@ export const ThreeDMap = () => {
     };
 
     return (
-        <div className="relative w-full h-screen overflow-hidden bg-gradient-forest">
+        <div className="relative w-full h-screen overflow-hidden bg-gradient-forest pt-24">
             {/* Hero overlay */}
             <div
                 className="absolute inset-0 opacity-20 mix-blend-overlay"
@@ -34,39 +34,7 @@ export const ThreeDMap = () => {
                 }}
             />
 
-            {/* Header */}
-            <div className="absolute top-0 left-0 right-0 z-40 bg-gradient-to-b from-background/90 to-transparent backdrop-blur-sm">
-                <div className="flex items-center justify-between p-6">
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <Map className="w-8 h-8 text-primary" />
-                            <div>
-                                <h1 className="text-2xl font-bold text-foreground">Quang Binh Vista Explorer</h1>
-                                <p className="text-sm text-muted-foreground">Discover the natural wonders of Vietnam</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setUse3DTest(!use3DTest)}
-                            className="shadow-nature"
-                        >
-                            {use3DTest ? '🗺️ Real Map' : '🧪 Test 3D'}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setShowInfo(!showInfo)}
-                            className="shadow-nature"
-                        >
-                            <Info className="w-4 h-4 mr-2" />
-                            About
-                        </Button>
-                    </div>
-                </div>
-            </div>
+
 
             {/* Filter bar */}
             <div className="absolute top-20 left-6 z-40 mt-4">
@@ -143,13 +111,14 @@ export const ThreeDMap = () => {
             </div>
 
             {/* Main 3D Map */}
-            <div className="absolute inset-0">
-                    <RealMap3D
-                        selectedLocation={selectedLocation}
-                        onLocationSelect={handleLocationSelect}
-                        locations={filteredLocations}
-                    />
+            <div className="absolute inset-0 h-full w-full">
+                <RealMap3D
+                    selectedLocation={selectedLocation}
+                    onLocationSelect={handleLocationSelect}
+                    locations={filteredLocations}
+                />
             </div>
+
 
             {/* Location Detail Panel */}
             <LocationPanel

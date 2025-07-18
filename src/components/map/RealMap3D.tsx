@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Key, Eye, EyeOff } from 'lucide-react';
-
+import {createThreeLayer} from "@/components/map/ThreeCustomLayer.ts";
 interface RealMapProps {
   selectedLocation: LocationPoint | null;
   onLocationSelect: (location: LocationPoint | null) => void;
@@ -60,8 +60,12 @@ export const RealMap3D: React.FC<RealMapProps> = ({
       pitch: 60, // 3D angle
       bearing: 0,
       maxBounds: QUANG_BINH_BOUNDS,
-      antialias: true
+      antialias: true,
+      dragRotate: true
     });
+
+    map.current.dragRotate.enable();
+    map.current.touchZoomRotate.enableRotation();
 
     // Add navigation controls
     map.current.addControl(new mapboxgl.NavigationControl({
@@ -220,9 +224,20 @@ export const RealMap3D: React.FC<RealMapProps> = ({
     }
   };
 
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    mapRef.current.on("style.load", () => {
+      if (!mapRef.current.getLayer('threejs-layer')) {
+        mapRef.current.addLayer(createThreeLayer(locations)); // locations là mảng data bạn đã có
+      }
+    });
+  }, [locations]);
+
   if (showTokenInput || !mapboxToken) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-50 to-blue-50 p-6">
+      <div className="w-full h-full relative flex items-center justify-center bg-gradient-to-br from-emerald-50 to-blue-50 p-6">
         <Card className="w-full max-w-md shadow-floating">
           <CardHeader className="text-center">
             <CardTitle className="flex items-center gap-2 justify-center text-primary">

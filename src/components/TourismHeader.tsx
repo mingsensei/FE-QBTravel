@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, MapPin, Calendar, Utensils, Camera, Info, Phone, Home } from 'lucide-react';
+import {Menu, X, MapPin, Calendar, Utensils, Camera, Info, Phone, Home, Gift} from 'lucide-react';
 import { Button } from './ui/button';
 import LoginRegister from './LoginRegister';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +22,7 @@ const TourismHeader = () => {
     { name: 'Destinations', href: '/destinations', icon: MapPin },
     { name: 'Map', href: '/map', icon: MapPin },
     { name: 'Experiences', href: '/experiences', icon: Camera },
-    { name: 'Cuisine', href: '/cuisine', icon: Utensils },
+    { name: 'Products', href: '/products', icon: Gift },
     { name: 'Events', href: '/events', icon: Calendar },
     { name: 'About Quang Binh', href: '/about', icon: Info },
     { name: 'Contact', href: '/contact', icon: Phone },
