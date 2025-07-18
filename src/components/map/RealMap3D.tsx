@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Key, Eye, EyeOff } from 'lucide-react';
-import {createThreeLayer} from "@/components/map/ThreeCustomLayer.ts";
+
 interface RealMapProps {
   selectedLocation: LocationPoint | null;
   onLocationSelect: (location: LocationPoint | null) => void;
@@ -179,14 +179,8 @@ export const RealMap3D: React.FC<RealMapProps> = ({
         </div>
       `);
 
-      markerEl.addEventListener('mouseenter', () => {
-        popup.setLngLat([lng, lat]).addTo(map.current!);
-      });
 
-      markerEl.addEventListener('mouseleave', () => {
-        popup.remove();
-      });
-
+      popup.setLngLat([lng, lat]).addTo(map.current!);
       markersRef.current.push(marker);
     });
 
@@ -224,16 +218,7 @@ export const RealMap3D: React.FC<RealMapProps> = ({
     }
   };
 
-  const mapRef = useRef<mapboxgl.Map | null>(null);
 
-  useEffect(() => {
-    if (!mapRef.current) return;
-    mapRef.current.on("style.load", () => {
-      if (!mapRef.current.getLayer('threejs-layer')) {
-        mapRef.current.addLayer(createThreeLayer(locations)); // locations là mảng data bạn đã có
-      }
-    });
-  }, [locations]);
 
   if (showTokenInput || !mapboxToken) {
     return (
