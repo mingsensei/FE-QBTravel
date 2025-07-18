@@ -1,57 +1,205 @@
 .map-container {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
 }
 
-/* Marker giống HTML mẫu */
-.marker {
-  background: none;
-  border: none;
+/* Custom Marker Styles */
+.custom-marker {
+  position: relative;
+  width: 50px;
+  height: 50px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.marker img {
-  display: block;
-  width: 40px;
-  height: 40px;
+.custom-marker.attraction .marker-inner {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+}
+
+.custom-marker.craft-village .marker-inner {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+
+.marker-inner {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
-.marker img:hover {
-  transform: scale(1.1);
+.marker-icon {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
-/* Popup đẹp */
+/* Pulsing Animation */
+.marker-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+  z-index: 1;
+}
+
+.custom-marker.attraction .marker-pulse {
+  background: rgba(34, 197, 94, 0.3);
+}
+
+.custom-marker.craft-village .marker-pulse {
+  background: rgba(245, 158, 11, 0.3);
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+/* Hover Effects */
+.custom-marker:hover .marker-inner {
+  transform: scale(1.2);
+}
+
+.custom-marker.marker-hover .marker-inner {
+  transform: scale(1.15);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
+}
+
+.custom-marker.craft-village.marker-hover .marker-inner {
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+}
+
+/* Custom Popup Styles */
+.custom-popup {
+  max-width: 350px;
+}
+
 .custom-popup .mapboxgl-popup-content {
-  text-align: center;
-  font-family: "Open Sans", sans-serif;
-  padding: 15px;
+  padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.custom-popup-content {
+  background: white;
+}
+
+.popup-header {
+  padding: 16px 20px 12px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.popup-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.3;
+}
+
+.popup-category {
+  display: inline-block;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.craft-village-popup .popup-category {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.popup-body {
+  padding: 16px 20px 20px;
+}
+
+.popup-description {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.popup-stats {
+  display: flex;
+  gap: 16px;
+  margin: 0 0 16px;
+  padding: 12px;
+  background: #f8fafc;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  background-color: #fff;
-  color: #333;
-  max-width: 250px;
 }
 
-.custom-popup .mapboxgl-popup-content h3 {
-  margin-top: 0;
-  margin-bottom: 5px;
-  font-size: 1.2em;
+.popup-rating,
+.popup-checkins {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.popup-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+}
+
+.highlight-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+}
+
+/* Close button styling */
+.custom-popup .mapboxgl-popup-close-button {
+  background: #f1f5f9;
+  color: #64748b;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
   font-weight: bold;
+  right: 8px;
+  top: 8px;
+  transition: all 0.2s ease;
 }
 
-.custom-popup .mapboxgl-popup-content p {
-  margin: 0 0 5px;
-  font-size: 0.9em;
-}
-
-.custom-popup .mapboxgl-popup-content small {
-  font-size: 0.8em;
-  color: #666;
-}
-
-.custom-popup .mapboxgl-popup-tip {
-  display: none;
+.custom-popup .mapboxgl-popup-close-button:hover {
+  background: #e2e8f0;
+  color: #334155;
+  transform: scale(1.1);
 }

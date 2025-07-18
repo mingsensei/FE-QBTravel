@@ -1,5 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Package, Utensils, DivideIcon as LucideIcon } from 'lucide-react';
+import { Calendar, Package, Utensils } from 'lucide-react';
+import { type LucideIcon } from 'lucide-react';
 
 interface TipCard {
   id: string;
