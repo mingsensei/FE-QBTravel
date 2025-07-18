@@ -1,14 +1,12 @@
-import React, { useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
+import React, { useState } from 'react';
+import { Float, Billboard, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { LocationPoint } from '@/types/map';
-import { Html } from '@react-three/drei';
-
 
 interface LocationMarkerProps {
   location: LocationPoint;
   isSelected: boolean;
-  onSelect: (location: LocationPoint) => void;
+  onSelect: (l: LocationPoint) => void;
 }
 
 export const LocationMarker: React.FC<LocationMarkerProps> = ({
@@ -16,77 +14,64 @@ export const LocationMarker: React.FC<LocationMarkerProps> = ({
   isSelected,
   onSelect,
 }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const glowRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
 
-  const markerColor = location.type === 'attraction' ? 0x3b82f6 : 0xf59e0b;
-  const glowColor = location.type === 'attraction' ? 0x60a5fa : 0xfbbf24;
-
-  useFrame((state) => {
-    if (meshRef.current && glowRef.current) {
-      const time = state.clock.elapsedTime;
-      
-      // Floating animation
-      meshRef.current.position.y = location.position[1] + Math.sin(time * 2) * 0.1 + 0.2;
-      
-      // Pulsing glow effect
-      const glowScale = 1 + Math.sin(time * 3) * 0.2;
-      glowRef.current.scale.setScalar(glowScale);
-      
-      // Hover and selection effects
-      if (isSelected || hovered) {
-        meshRef.current.scale.setScalar(1.3);
-        glowRef.current.scale.setScalar(glowScale * 1.5);
-      } else {
-        meshRef.current.scale.setScalar(1);
-      }
-    }
-  });
+  const markerColor = location.type === 'attraction' ? '#3b82f6' : '#f59e0b';
+  const glowColor   = location.type === 'attraction' ? '#60a5fa' : '#fbbf24';
 
   return (
-    <group position={[location.position[0], 0, location.position[2]]}>
-      {/* Glow effect */}
-      <mesh
-        ref={glowRef}
-        position={[0, location.position[1] + 0.2, 0]}
-      >
-        <sphereGeometry args={[0.15, 16, 16]} />
-        <meshBasicMaterial
-          color={glowColor}
-          transparent
-          opacity={0.3}
-        />
-      </mesh>
-      
-      {/* Main marker */}
-      <mesh
-        ref={meshRef}
-        position={[0, location.position[1] + 0.2, 0]}
-        onClick={() => onSelect(location)}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-      >
-        <sphereGeometry args={[0.08, 16, 16]} />
-        <meshStandardMaterial
-          color={markerColor}
-          emissive={markerColor}
-          emissiveIntensity={0.3}
-          roughness={0.3}
-          metalness={0.7}
-        />
-      </mesh>
-      
-      {/* Floating label */}
-      {(hovered || isSelected) && (
-        <mesh position={[0, location.position[1] + 0.8, 0]}>
-          <planeGeometry args={[2, 0.4]} />
+    /* 👈 Đặt đủ [x,y,z] => không còn “dính” trục Y */
+    <group position={location.position as [number, number, number]}>
+      {/* Tạo chuyển động trôi nhẹ */}
+      <Float speed={2} floatIntensity={1.5} rotationIntensity={0}>
+        {/* Glow mờ (depthWrite=false để không chặn marker khác) */}
+        <mesh scale={isSelected || hovered ? 1.9 : 1.6}>
+          <sphereGeometry args={[0.08, 16, 16]} />
           <meshBasicMaterial
-            color={0x000000}
+            color={glowColor}
             transparent
-            opacity={0.7}
+            opacity={0.35}
+            depthWrite={false}
           />
         </mesh>
+
+        {/* Marker chính */}
+        <mesh
+          scale={isSelected || hovered ? 1.3 : 1}
+          onClick={() => onSelect(location)}
+          onPointerOver={() => setHovered(true)}
+          onPointerOut={() => setHovered(false)}
+        >
+          <sphereGeometry args={[0.08, 16, 16]} />
+          <meshStandardMaterial
+            color={markerColor}
+            emissive={markerColor}
+            emissiveIntensity={0.35}
+            roughness={0.3}
+            metalness={0.7}
+          />
+        </mesh>
+      </Float>
+
+      {/* Tên địa điểm – luôn nhìn về camera */}
+      {(hovered || isSelected) && (
+        <Billboard position={[0, 0.65, 0]} follow>
+          <Html
+            center
+            distanceFactor={6}
+            style={{
+              padding: '3px 6px',
+              background: 'rgba(0,0,0,0.7)',
+              color: 'white',
+              fontSize: 12,
+              borderRadius: 4,
+              whiteSpace: 'nowrap',
+              pointerEvents: 'none',
+            }}
+          >
+            {location.name}
+          </Html>
+        </Billboard>
       )}
     </group>
   );
