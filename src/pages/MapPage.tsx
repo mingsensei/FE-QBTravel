@@ -8,16 +8,18 @@ import { LocationPanel } from '@/components/ui/location-panel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { MapPin, Users, Star, ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-mapboxgl.accessToken = 'pk.eyJ1Ijoiam9obmJpZGF0IiwiYSI6ImNtZDJocDE2cTBheWYybHBxNDZxeDZ5YmkifQ.8HhkYUtlOo5UrZpguhMPrw';
 
 const MapPage: React.FC = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<LocationPoint | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isExplorationOpen, setIsExplorationOpen] = useState(false);
+  const [mapboxToken, setMapboxToken] = useState("");
+  const [showTokenInput, setShowTokenInput] = useState(false);
+  const [tokenInput, setTokenInput] = useState("");
 
   const createMarkerElement = (location: LocationPoint) => {
     const el = document.createElement('div');
@@ -55,8 +57,18 @@ const MapPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!mapRef.current) return;
+    const saved = localStorage.getItem("mapbox_token");
+    if (saved) {
+      setMapboxToken(saved);
+    } else {
+      setShowTokenInput(true);
+    }
+  }, []);
 
+  useEffect(() => {
+    if (!mapRef.current || !mapboxToken) return;
+
+    mapboxgl.accessToken = mapboxToken;
     console.log('MapPage: Initializing map with', allLocations.length, 'locations');
 
     const map = new mapboxgl.Map({
@@ -109,7 +121,16 @@ const MapPage: React.FC = () => {
     });
 
     return () => map.remove();
-  }, []);
+  }, [mapboxToken]);
+
+  const handleTokenSubmit = () => {
+    if (tokenInput.trim()) {
+      localStorage.setItem("mapbox_token", tokenInput.trim());
+      setMapboxToken(tokenInput.trim());
+      setShowTokenInput(false);
+      setTokenInput("");
+    }
+  };
 
   const handleLocationSelect = (location: LocationPoint) => {
     setSelectedLocation(location);
@@ -151,6 +172,39 @@ const MapPage: React.FC = () => {
       </CardContent>
     </Card>
   );
+
+  if (showTokenInput || !mapboxToken) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-blue-50 p-6">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-center">Mapbox Configuration</CardTitle>
+            <p className="text-sm text-muted-foreground text-center">
+              Enter your Mapbox public token to display the map
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Input
+              type="text"
+              placeholder="pk.eyJ1IjoieW91cnVzZXJuYW1lIi..."
+              value={tokenInput}
+              onChange={(e) => setTokenInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleTokenSubmit()}
+            />
+            <Button onClick={handleTokenSubmit} className="w-full" disabled={!tokenInput.trim()}>
+              Save Token
+            </Button>
+            <div className="text-xs text-muted-foreground text-center">
+              Get your token from{' '}
+              <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                mapbox.com
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
