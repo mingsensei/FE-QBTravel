@@ -58,7 +58,11 @@ export const LocationPanel: React.FC<LocationPanelProps> = ({
 
   return (
     <div className={cn(
-      "fixed right-0 top-0 h-full w-full max-w-2xl bg-card shadow-floating z-50 overflow-y-auto transition-transform duration-500 ease-bounce",
+      "fixed z-50 bg-card shadow-floating overflow-y-auto transition-transform duration-500",
+      // Mobile: Bottom panel with rounded top corners
+      "bottom-0 left-0 right-0 top-auto h-[85vh] rounded-t-xl",
+      // Desktop: Right panel
+      "md:top-0 md:bottom-0 md:left-auto md:right-0 md:h-full md:w-full md:max-w-2xl md:rounded-none",
       className
     )}>
       <div className="relative">

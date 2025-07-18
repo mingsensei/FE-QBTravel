@@ -1,14 +1,23 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '../Map.css'; // file css chứa marker + popup
-import { allLocations } from '@/data/locations';
+import { allLocations, famousPlaces, craftVillages } from '@/data/locations';
 import { LocationPoint } from '@/types/map';
+import { LocationPanel } from '@/components/ui/location-panel';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Users, Star, ChevronUp, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoiam9obmJpZGF0IiwiYSI6ImNtZDJocDE2cTBheWYybHBxNDZxeDZ5YmkifQ.8HhkYUtlOo5UrZpguhMPrw';
 
 const MapPage: React.FC = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<LocationPoint | null>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isExplorationOpen, setIsExplorationOpen] = useState(false);
 
   const createMarkerElement = (location: LocationPoint) => {
     const el = document.createElement('div');
@@ -82,7 +91,8 @@ const MapPage: React.FC = () => {
         // Add click event to marker
         markerEl.addEventListener('click', () => {
           console.log('Marker clicked:', location.name);
-          popup.setLngLat(location.coordinates).addTo(map);
+          setSelectedLocation(location);
+          setIsPanelOpen(true);
         });
 
         // Add hover effects
@@ -101,7 +111,122 @@ const MapPage: React.FC = () => {
     return () => map.remove();
   }, []);
 
-  return <div ref={mapRef} className="map-container" />;
+  const handleLocationSelect = (location: LocationPoint) => {
+    setSelectedLocation(location);
+    setIsPanelOpen(true);
+    setIsExplorationOpen(false);
+  };
+
+  const renderLocationCard = (location: LocationPoint) => (
+    <Card 
+      key={location.id}
+      className="cursor-pointer hover:shadow-lg transition-all duration-200 border-border/50"
+      onClick={() => handleLocationSelect(location)}
+    >
+      <div className="relative h-32 overflow-hidden rounded-t-lg">
+        <img
+          src={location.images[0]}
+          alt={location.name}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute top-2 right-2">
+          <Badge variant={location.type === 'attraction' ? 'default' : 'secondary'} className="text-xs">
+            {location.type === 'attraction' ? 'Attraction' : 'Craft'}
+          </Badge>
+        </div>
+      </div>
+      <CardContent className="p-3">
+        <h3 className="font-semibold text-sm mb-1 line-clamp-1">{location.name}</h3>
+        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{location.description}</p>
+        <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center gap-1">
+            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+            <span>{location.rating}</span>
+          </div>
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <Users className="w-3 h-3" />
+            <span>{location.checkIns.toLocaleString()}</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <div className="relative h-screen w-full overflow-hidden">
+      {/* Map */}
+      <div ref={mapRef} className="absolute inset-0 map-container" />
+      
+      {/* Mobile-first Exploration Panel - Bottom */}
+      <div className={cn(
+        "fixed bottom-0 left-0 right-0 bg-background border-t border-border shadow-lg transition-transform duration-300 z-40",
+        "md:left-0 md:top-0 md:bottom-0 md:w-80 md:border-r md:border-t-0",
+        isExplorationOpen ? "translate-y-0" : "translate-y-[calc(100%-4rem)]",
+        "md:translate-y-0"
+      )}>
+        {/* Toggle Button - Mobile Only */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsExplorationOpen(!isExplorationOpen)}
+          className="w-full flex items-center justify-center gap-2 h-16 md:hidden border-none rounded-none"
+        >
+          {isExplorationOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+          <span className="font-medium">Explore Locations</span>
+          <Badge variant="secondary" className="text-xs">
+            {allLocations.length}
+          </Badge>
+        </Button>
+
+        {/* Panel Content */}
+        <div className="h-[60vh] md:h-full overflow-y-auto">
+          <div className="hidden md:block p-4 border-b border-border">
+            <h2 className="text-lg font-semibold">Explore Quang Binh</h2>
+            <p className="text-sm text-muted-foreground">Discover amazing destinations</p>
+          </div>
+
+          <div className="p-4 space-y-4">
+            {/* Famous Places */}
+            <div>
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" />
+                Famous Places
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
+                {famousPlaces.map(renderLocationCard)}
+              </div>
+            </div>
+
+            {/* Craft Villages */}
+            <div>
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-secondary" />
+                Craft Villages
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
+                {craftVillages.map(renderLocationCard)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Location Detail Panel - Mobile: Bottom, Desktop: Right */}
+      {isPanelOpen && selectedLocation && (
+        <LocationPanel
+          location={selectedLocation}
+          onClose={() => {
+            setIsPanelOpen(false);
+            setSelectedLocation(null);
+          }}
+          className={cn(
+            "md:right-0 md:top-0 md:h-full md:max-w-2xl",
+            "mobile-panel"
+          )}
+        />
+      )}
+    </div>
+  );
 };
 
 export default MapPage;
