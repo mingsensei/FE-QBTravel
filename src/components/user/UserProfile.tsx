@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -39,13 +39,12 @@ interface UserData {
   };
 }
 
-interface ActivityItem {
-  id: string;
-  type: 'comment' | 'like' | 'upload' | 'review';
-  title: string;
-  description: string;
-  date: string;
-  location?: string;
+interface ActivityHistoryItem {
+  stopId: number;
+  locationName: string;
+  createdAt: string;
+  itineraryId: number;
+  itineraryTitle: string;
 }
 
 const UserProfile = () => {
@@ -71,59 +70,35 @@ const UserProfile = () => {
     }
   });
 
-  // Mock activity data
-  const activityHistory: ActivityItem[] = [
-    {
-      id: '1',
-      type: 'review',
-      title: 'Reviewed Phong Nha Cave',
-      description: 'Amazing cave system with spectacular formations. The boat ride through the underground river was unforgettable!',
-      date: '2024-01-15',
-      location: 'Phong Nha-Ke Bang National Park'
-    },
-    {
-      id: '2',
-      type: 'upload',
-      title: 'Uploaded photos of Paradise Cave',
-      description: 'Shared 8 photos from my recent visit to Paradise Cave',
-      date: '2024-01-10'
-    },
-    {
-      id: '3',
-      type: 'like',
-      title: 'Liked Dark Cave Adventure',
-      description: 'Loved this thrilling zip-line and mud bath experience',
-      date: '2024-01-08',
-      location: 'Dark Cave'
-    },
-    {
-      id: '4',
-      type: 'comment',
-      title: 'Commented on Son Tra Peninsula',
-      description: 'Great tips for the hiking trail! Thanks for sharing the detailed route.',
-      date: '2024-01-05'
-    }
-  ];
+  // Activity History state (dữ liệu thật từ API)
+  const [activityHistory, setActivityHistory] = useState<ActivityHistoryItem[]>([]);
+  const [activityLoading, setActivityLoading] = useState(true);
 
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'comment': return <MessageCircle className="h-4 w-4" />;
-      case 'like': return <Heart className="h-4 w-4" />;
-      case 'upload': return <Camera className="h-4 w-4" />;
-      case 'review': return <Star className="h-4 w-4" />;
-      default: return <Activity className="h-4 w-4" />;
-    }
-  };
+  // Fetch activity history
+  useEffect(() => {
+    const userId = 1; // set cứng theo yêu cầu
+    const token = localStorage.getItem('accessToken');
+    setActivityLoading(true);
+    fetch(`http://localhost:8081/api/user/${userId}/activity-history`, {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Unauthorized');
+        return res.json();
+      })
+      .then(data => setActivityHistory(data))
+      .catch(err => {
+        console.error(err);
+        setActivityHistory([]);
+      })
+      .finally(() => setActivityLoading(false));
+  }, []);
 
-  const getActivityColor = (type: string) => {
-    switch (type) {
-      case 'comment': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'like': return 'bg-red-100 text-red-700 border-red-200';
-      case 'upload': return 'bg-primary/10 text-primary border-primary/20';
-      case 'review': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      default: return 'bg-muted text-muted-foreground border-border';
-    }
-  };
+  const getActivityIcon = () => (
+    <MapPin className="h-4 w-4" />
+  );
 
   const handleUpdateProfile = (updatedData: Partial<UserData>) => {
     setUserData(prev => ({ ...prev, ...updatedData }));
@@ -131,8 +106,8 @@ const UserProfile = () => {
   };
 
   return (
-      <div className="min-h-screen bg-gradient-nature p-4 pt-24">
-  <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+    <div className="min-h-screen bg-gradient-nature p-4 pt-24">
+      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
         {/* Header Card */}
         <Card className="shadow-card bg-gradient-card border-border/50">
           <CardHeader className="pb-4">
@@ -222,43 +197,41 @@ const UserProfile = () => {
               {/* Activity History Tab */}
               <TabsContent value="activity" className="space-y-4 mt-4">
                 <div className="space-y-3">
-                  {activityHistory.map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="flex gap-4 p-4 rounded-lg border border-border/50 bg-background/50 hover:bg-accent/50 transition-colors duration-200"
-                    >
-                      <div className={`p-2 rounded-full ${getActivityColor(activity.type)} flex-shrink-0`}>
-                        {getActivityIcon(activity.type)}
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="font-medium text-foreground text-sm">{activity.title}</h3>
-                          <span className="text-xs text-muted-foreground flex-shrink-0">
-                            {new Date(activity.date).toLocaleDateString()}
-                          </span>
+                  {activityLoading ? (
+                    <div className="text-center text-muted-foreground py-8">Loading activity...</div>
+                  ) : activityHistory.length === 0 ? (
+                    <div className="text-center text-muted-foreground py-8">No activity history yet.</div>
+                  ) : (
+                    activityHistory.map((item) => (
+                      <div
+                        key={item.stopId}
+                        className="flex gap-4 p-4 rounded-lg border border-border/50 bg-background/50 hover:bg-accent/50 transition-colors duration-200"
+                      >
+                        <div className="p-2 rounded-full bg-primary/10 text-primary flex-shrink-0">
+                          {getActivityIcon()}
                         </div>
-                        
-                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                          {activity.description}
-                        </p>
-                        
-                        {activity.location && (
-                          <div className="flex items-center gap-1 mt-2">
-                            <MapPin className="h-3 w-3 text-primary" />
-                            <span className="text-xs text-primary">{activity.location}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="font-medium text-foreground text-sm">{item.locationName}</h3>
+                            <span className="text-xs text-muted-foreground flex-shrink-0">
+                              {new Date(item.createdAt).toLocaleDateString()}
+                            </span>
                           </div>
-                        )}
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                            <span className="font-medium text-primary">Itinerary: </span>
+                            {item.itineraryTitle}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
-
-                <div className="text-center pt-4">
+                {/* Load more button nếu cần (mock) */}
+                {/* <div className="text-center pt-4">
                   <Button variant="outline" className="w-full sm:w-auto">
                     Load More Activity
                   </Button>
-                </div>
+                </div> */}
               </TabsContent>
 
               {/* Account Settings Tab */}
@@ -283,7 +256,6 @@ const UserProfile = () => {
                       Change
                     </Button>
                   </div>
-
                   {/* Notification Settings */}
                   <div className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-background/50 hover:bg-accent/50 transition-colors duration-200">
                     <div className="flex items-center gap-3">
@@ -303,7 +275,6 @@ const UserProfile = () => {
                       Manage
                     </Button>
                   </div>
-
                   {/* Privacy Settings */}
                   <div className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-background/50 hover:bg-accent/50 transition-colors duration-200">
                     <div className="flex items-center gap-3">
@@ -319,7 +290,6 @@ const UserProfile = () => {
                       Configure
                     </Button>
                   </div>
-
                   {/* Logout */}
                   <div className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-background/50 hover:bg-accent/50 transition-colors duration-200">
                     <div className="flex items-center gap-3">
@@ -335,7 +305,6 @@ const UserProfile = () => {
                       Sign Out
                     </Button>
                   </div>
-
                   {/* Delete Account */}
                   <div className="flex items-center justify-between p-4 rounded-lg border border-destructive/20 bg-destructive/5 hover:bg-destructive/10 transition-colors duration-200">
                     <div className="flex items-center gap-3">
@@ -377,14 +346,12 @@ const UserProfile = () => {
           onCancel={() => setShowEditProfile(false)}
         />
       )}
-
       {showChangePassword && (
         <ChangePassword
           onSave={() => setShowChangePassword(false)}
           onCancel={() => setShowChangePassword(false)}
         />
       )}
-
       {showAccountSettings && (
         <AccountSettings
           onSave={() => setShowAccountSettings(false)}
