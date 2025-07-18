@@ -4,35 +4,99 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
-import { MapPin, Eye, EyeOff, Mail, Lock, User, CheckCircle, AlertCircle } from 'lucide-react';
+import { MapPin, Eye, EyeOff, Mail, Lock, User, CheckCircle, AlertCircle, Loader2, Phone } from 'lucide-react';
 
 interface FormData {
-  email: string;
+  // Common fields
   password: string;
-  name?: string;
+  username?: string;
+  // Register specific fields
+  email?: string;
+  fullName?: string;
+  phone?: string;
   confirmPassword?: string;
+  role?: string;
 }
 
 interface FormErrors {
   email?: string;
   password?: string;
-  name?: string;
+  username?: string;
+  fullName?: string;
+  phone?: string;
   confirmPassword?: string;
 }
+
+// Thêm interface để định nghĩa props cho InputField
+interface InputFieldProps {
+  label: string;
+  type: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  showPasswordToggle?: boolean;
+  showPassword?: boolean;
+  onTogglePassword?: () => void;
+}
+
+const InputField = ({
+  label, type, value, onChange, error, icon: Icon,
+  showPasswordToggle = false, showPassword: showPass, onTogglePassword
+}: InputFieldProps) => (
+  <div className="space-y-2">
+    <Label htmlFor={label.toLowerCase().replace(/\s/g, '-')} className="text-sm font-medium text-foreground">
+      {label}
+    </Label>
+    <div className="relative">
+      <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <Input
+        id={label.toLowerCase().replace(/\s/g, '-')}
+        type={showPasswordToggle ? (showPass ? 'text' : 'password') : type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={`pl-10 pr-10 transition-all duration-200 ${error ? 'border-destructive focus:border-destructive focus:ring-destructive/20' : 'border-border focus:border-primary focus:ring-primary/20'}`}
+        placeholder={`Nhập ${label.toLowerCase()} của bạn`}
+      />
+      {showPasswordToggle && (
+        <button type="button" onClick={onTogglePassword} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground">
+          {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      )}
+    </div>
+    {error && (
+      <div className="flex items-center gap-1 text-destructive text-xs">
+        <AlertCircle className="h-3 w-3" />
+        <span>{error}</span>
+      </div>
+    )}
+  </div>
+);
+
 
 const LoginRegister = () => {
   const [activeTab, setActiveTab] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loginData, setLoginData] = useState<FormData>({ email: '', password: '' });
+  const [loginData, setLoginData] = useState<FormData>({ username: '', password: '' });
+  
   const [registerData, setRegisterData] = useState<FormData>({
-    name: '',
+    username: '',
+    fullName: '',
     email: '',
+    phone: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    role: 'USER'
   });
+
   const [loginErrors, setLoginErrors] = useState<FormErrors>({});
   const [registerErrors, setRegisterErrors] = useState<FormErrors>({});
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [apiSuccess, setApiSuccess] = useState<string | null>(null);
+
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,32 +104,26 @@ const LoginRegister = () => {
   };
 
   const validatePassword = (password: string) => {
-    return password.length >= 6;
+    return password.length >= 8;
   };
 
   const validateLoginForm = () => {
     const errors: FormErrors = {};
-
-    if (!loginData.email) {
-      errors.email = 'Email is required';
-    } else if (!validateEmail(loginData.email)) {
-      errors.email = 'Please enter a valid email';
+    if (!loginData.username) {
+      errors.username = 'Username is required';
     }
-
     if (!loginData.password) {
       errors.password = 'Password is required';
     }
-
     setLoginErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const validateRegisterForm = () => {
     const errors: FormErrors = {};
-
-    if (!registerData.name) {
-      errors.name = 'Name is required';
-    }
+    if (!registerData.username) errors.username = 'Username is required';
+    if (!registerData.fullName) errors.fullName = 'Full name is required';
+    if (!registerData.phone) errors.phone = 'Phone number is required';
 
     if (!registerData.email) {
       errors.email = 'Email is required';
@@ -76,323 +134,227 @@ const LoginRegister = () => {
     if (!registerData.password) {
       errors.password = 'Password is required';
     } else if (!validatePassword(registerData.password)) {
-      errors.password = 'Password must be at least 6 characters';
+      errors.password = 'Password must be at least 8 characters';
     }
 
-    if (!registerData.confirmPassword) {
-      errors.confirmPassword = 'Please confirm your password';
-    } else if (registerData.password !== registerData.confirmPassword) {
+    if (registerData.password !== registerData.confirmPassword) {
       errors.confirmPassword = 'Passwords do not match';
     }
-
     setRegisterErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateLoginForm()) {
-      console.log('Login attempt:', loginData);
-      // Handle login logic here
+  const clearNotifications = () => {
+    setApiError(null);
+    setApiSuccess(null);
+  }
+
+  // Hàm chuyển hướng đến trang home
+  const redirectToHome = () => {
+    // Thay đổi URL này thành đường dẫn trang home của bạn
+    window.location.href = '/';
+    // Hoặc nếu bạn dùng React Router, có thể dùng:
+    // navigate('/home');
+  };
+
+  // --- HÀM XỬ LÝ LOGIN ---
+  const handleLoginSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    clearNotifications();
+
+    if (!validateLoginForm()) return;
+
+    setIsLoading(true);
+    try {
+      const API_ENDPOINT = 'http://localhost:8081/api/auth/login';
+      const response = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: loginData.username,
+          password: loginData.password,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
+
+      // Lưu token vào localStorage
+      localStorage.setItem('accessToken', result.accessToken);
+      localStorage.setItem('refreshToken', result.refreshToken);
+      
+      // Hiển thị thông báo thành công
+      setApiSuccess('Đăng nhập thành công! Đang chuyển hướng...');
+      
+      // Chuyển hướng đến trang home sau 1.5 giây
+      setTimeout(() => {
+        redirectToHome();
+      }, 1500);
+
+    } catch (error) {
+      console.error('Login error:', error);
+      setApiError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateRegisterForm()) {
-      console.log('Register attempt:', registerData);
-      // Handle registration logic here
+  // --- HÀM XỬ LÝ REGISTER ---
+  const handleRegisterSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    clearNotifications();
+
+    if (!validateRegisterForm()) return;
+
+    setIsLoading(true);
+    try {
+      const API_ENDPOINT = 'http://localhost:8081/api/auth/register';
+      const { confirmPassword, ...payload } = registerData;
+      const response = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const resultText = await response.text();
+
+      if (!response.ok) {
+        throw new Error(resultText || 'Đăng ký thất bại. Vui lòng thử lại.');
+      }
+      
+      if (resultText !== 'Register Success') {
+          console.warn("Register API returned an unexpected success message:", resultText);
+      }
+
+      setApiSuccess('Đăng ký thành công! Vui lòng chuyển qua tab đăng nhập.');
+      setTimeout(() => {
+        setActiveTab('login');
+        clearNotifications();
+      }, 2000);
+
+    } catch (error) {
+      console.error('Register error:', error);
+      setApiError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const InputField = ({
-                        label,
-                        type,
-                        value,
-                        onChange,
-                        error,
-                        icon: Icon,
-                        showPasswordToggle = false,
-                        showPassword: showPass,
-                        onTogglePassword
-                      }: {
-    label: string;
-    type: string;
-    value: string;
-    onChange: (value: string) => void;
-    error?: string;
-    icon: any;
-    showPasswordToggle?: boolean;
-    showPassword?: boolean;
-    onTogglePassword?: () => void;
-  }) => (
-      <div className="space-y-2">
-        <Label htmlFor={label.toLowerCase().replace(' ', '-')} className="text-sm font-medium text-foreground">
-          {label}
-        </Label>
-        <div className="relative">
-          <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-              id={label.toLowerCase().replace(' ', '-')}
-              type={showPasswordToggle ? (showPass ? 'text' : 'password') : type}
-              value={value}
-              onChange={(e) => onChange(e.target.value)}
-              className={`pl-10 pr-10 transition-all duration-200 ${
-                  error
-                      ? 'border-destructive focus:border-destructive focus:ring-destructive/20'
-                      : 'border-border focus:border-primary focus:ring-primary/20'
-              }`}
-              placeholder={`Enter your ${label.toLowerCase()}`}
-          />
-          {showPasswordToggle && (
-              <button
-                  type="button"
-                  onClick={onTogglePassword}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
-              >
-                {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-          )}
-        </div>
-        {error && (
-            <div className="flex items-center gap-1 text-destructive text-xs animate-slide-in">
-              <AlertCircle className="h-3 w-3" />
-              <span>{error}</span>
-            </div>
-        )}
-      </div>
-  );
 
   return (
-      <div className="min-h-screen bg-gradient-nature flex items-center justify-center p-4">
-        <div className="w-full max-w-md animate-fade-in">
-          {/* Logo/Brand Header */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="relative">
-                <MapPin className="h-10 w-10 text-primary" />
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary-glow rounded-full animate-pulse"></div>
-              </div>
-              <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Quang Binh Travel Map
-              </h1>
-            </div>
-            <p className="text-muted-foreground text-sm">
-              Discover the hidden gems of Quang Binh Province
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <MapPin className="h-10 w-10 text-green-600" />
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Quang Binh Travel Map</h1>
           </div>
+          <p className="text-gray-600 text-sm">Khám phá những viên ngọc ẩn của tỉnh Quảng Bình</p>
+        </div>
 
-          <Card className="shadow-card bg-gradient-card border-border/50 backdrop-blur-sm">
-            <CardHeader className="space-y-1">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 bg-muted/50">
-                  <TabsTrigger value="login" className="text-sm font-medium">
-                    Sign In
-                  </TabsTrigger>
-                  <TabsTrigger value="register" className="text-sm font-medium">
-                    Sign Up
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </CardHeader>
+        <Card className="shadow-xl bg-white/95 border-gray-200 backdrop-blur-sm">
+          <CardHeader>
+            <Tabs value={activeTab} onValueChange={(tab) => { setActiveTab(tab); clearNotifications(); }} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 bg-gray-100">
+                <TabsTrigger value="login">Đăng nhập</TabsTrigger>
+                <TabsTrigger value="register">Đăng ký</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </CardHeader>
 
-            <CardContent className="space-y-6">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                {/* Login Form */}
-                <TabsContent value="login" className="space-y-4">
-                  <div className="space-y-2 text-center">
-                    <CardTitle className="text-xl font-semibold">Welcome back!</CardTitle>
-                    <CardDescription>
-                      Sign in to your account to continue exploring
-                    </CardDescription>
-                  </div>
+          <CardContent className="space-y-6 pt-6">
+            {apiError && (
+              <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-md border border-red-200">
+                <AlertCircle className="h-4 w-4" />
+                <span>{apiError}</span>
+              </div>
+            )}
+            {apiSuccess && (
+              <div className="flex items-center gap-2 text-green-600 text-sm bg-green-50 p-3 rounded-md border border-green-200">
+                <CheckCircle className="h-4 w-4" />
+                <span>{apiSuccess}</span>
+              </div>
+            )}
+            <Tabs value={activeTab}>
+              <TabsContent value="login">
+                <div className="space-y-2 text-center mb-4">
+                  <CardTitle className="text-xl font-semibold">Chào mừng trở lại!</CardTitle>
+                  <CardDescription>Đăng nhập vào tài khoản của bạn</CardDescription>
+                </div>
+                <div className="space-y-4">
+                  <InputField
+                    label="Tên đăng nhập"
+                    type="text"
+                    value={loginData.username || ''}
+                    onChange={(value) => setLoginData({ ...loginData, username: value })}
+                    error={loginErrors.username}
+                    icon={User}
+                  />
+                  <InputField
+                    label="Mật khẩu"
+                    type="password"
+                    value={loginData.password}
+                    onChange={(value) => setLoginData({ ...loginData, password: value })}
+                    error={loginErrors.password}
+                    icon={Lock}
+                    showPasswordToggle
+                    showPassword={showPassword}
+                    onTogglePassword={() => setShowPassword(!showPassword)}
+                  />
+                  <Button type="button" onClick={handleLoginSubmit} className="w-full bg-green-600 hover:bg-green-700" disabled={isLoading}>
+                    {isLoading && activeTab === 'login' ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /><span>Đang đăng nhập...</span></> : 'Đăng nhập'}
+                  </Button>
+                </div>
+              </TabsContent>
 
-                  <form onSubmit={handleLoginSubmit} className="space-y-4">
+              <TabsContent value="register">
+                 <div className="space-y-2 text-center mb-4">
+                  <CardTitle className="text-xl font-semibold">Tạo tài khoản</CardTitle>
+                  <CardDescription>Tham gia cùng chúng tôi để bắt đầu cuộc phiêu lưu du lịch của bạn</CardDescription>
+                </div>
+                <div className="space-y-4">
                     <InputField
-                        label="Email"
-                        type="email"
-                        value={loginData.email}
-                        onChange={(value) => setLoginData({ ...loginData, email: value })}
-                        error={loginErrors.email}
-                        icon={Mail}
+                        label="Tên đăng nhập" type="text" value={registerData.username || ''}
+                        onChange={(value) => setRegisterData({ ...registerData, username: value })}
+                        error={registerErrors.username} icon={User}
                     />
-
                     <InputField
-                        label="Password"
-                        type="password"
-                        value={loginData.password}
-                        onChange={(value) => setLoginData({ ...loginData, password: value })}
-                        error={loginErrors.password}
-                        icon={Lock}
-                        showPasswordToggle
-                        showPassword={showPassword}
-                        onTogglePassword={() => setShowPassword(!showPassword)}
+                        label="Họ và Tên" type="text" value={registerData.fullName || ''}
+                        onChange={(value) => setRegisterData({ ...registerData, fullName: value })}
+                        error={registerErrors.fullName} icon={User}
                     />
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <input
-                            type="checkbox"
-                            id="remember"
-                            className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary/20"
-                        />
-                        <label htmlFor="remember" className="text-sm text-muted-foreground">
-                          Remember me
-                        </label>
-                      </div>
-                      <button
-                          type="button"
-                          className="text-sm text-primary hover:text-primary-glow underline-offset-4 hover:underline transition-colors duration-200"
-                      >
-                        Forgot password?
-                      </button>
-                    </div>
-
-                    <Button
-                        type="submit"
-                        variant="default"
-                        className="w-full font-medium"
-                        size="lg"
-                    >
-                      Sign In
-                    </Button>
-                  </form>
-                </TabsContent>
-
-                {/* Register Form */}
-                <TabsContent value="register" className="space-y-4">
-                  <div className="space-y-2 text-center">
-                    <CardTitle className="text-xl font-semibold">Create Account</CardTitle>
-                    <CardDescription>
-                      Join us to start your travel adventure
-                    </CardDescription>
-                  </div>
-
-                  <form onSubmit={handleRegisterSubmit} className="space-y-4">
-                    <InputField
-                        label="Full Name"
-                        type="text"
-                        value={registerData.name || ''}
-                        onChange={(value) => setRegisterData({ ...registerData, name: value })}
-                        error={registerErrors.name}
-                        icon={User}
+                     <InputField
+                        label="Số điện thoại" type="tel" value={registerData.phone || ''}
+                        onChange={(value) => setRegisterData({ ...registerData, phone: value })}
+                        error={registerErrors.phone} icon={Phone}
                     />
-
                     <InputField
-                        label="Email"
-                        type="email"
-                        value={registerData.email}
+                        label="Email" type="email" value={registerData.email || ''}
                         onChange={(value) => setRegisterData({ ...registerData, email: value })}
-                        error={registerErrors.email}
-                        icon={Mail}
+                        error={registerErrors.email} icon={Mail}
                     />
-
                     <InputField
-                        label="Password"
-                        type="password"
-                        value={registerData.password}
+                        label="Mật khẩu" type="password" value={registerData.password || ''}
                         onChange={(value) => setRegisterData({ ...registerData, password: value })}
-                        error={registerErrors.password}
-                        icon={Lock}
-                        showPasswordToggle
-                        showPassword={showPassword}
+                        error={registerErrors.password} icon={Lock}
+                        showPasswordToggle showPassword={showPassword}
                         onTogglePassword={() => setShowPassword(!showPassword)}
                     />
-
                     <InputField
-                        label="Confirm Password"
-                        type="password"
-                        value={registerData.confirmPassword || ''}
+                        label="Xác nhận mật khẩu" type="password" value={registerData.confirmPassword || ''}
                         onChange={(value) => setRegisterData({ ...registerData, confirmPassword: value })}
-                        error={registerErrors.confirmPassword}
-                        icon={Lock}
-                        showPasswordToggle
-                        showPassword={showConfirmPassword}
+                        error={registerErrors.confirmPassword} icon={Lock}
+                        showPasswordToggle showPassword={showConfirmPassword}
                         onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
                     />
-
-                    <div className="flex items-center space-x-2">
-                      <input
-                          type="checkbox"
-                          id="terms"
-                          required
-                          className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary/20"
-                      />
-                      <label htmlFor="terms" className="text-sm text-muted-foreground">
-                        I agree to the{' '}
-                        <button
-                            type="button"
-                            className="text-primary hover:text-primary-glow underline-offset-4 hover:underline"
-                        >
-                          Terms of Service
-                        </button>
-                        {' '}and{' '}
-                        <button
-                            type="button"
-                            className="text-primary hover:text-primary-glow underline-offset-4 hover:underline"
-                        >
-                          Privacy Policy
-                        </button>
-                      </label>
-                    </div>
-
-                    <Button
-                        type="submit"
-                        variant="default"
-                        className="w-full font-medium"
-                        size="lg"
-                    >
-                      Create Account
+                     <Button type="button" onClick={handleRegisterSubmit} className="w-full bg-green-600 hover:bg-green-700" disabled={isLoading}>
+                        {isLoading && activeTab === 'register' ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /><span>Đang tạo...</span></> : 'Tạo tài khoản'}
                     </Button>
-                  </form>
-                </TabsContent>
-              </Tabs>
-
-              {/* Social Login Section */}
-              <div className="space-y-4">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-border" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
-                  </div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <Button variant="outline" className="font-medium">
-                    <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">
-                      <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                      <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    Google
-                  </Button>
-                  <Button variant="outline" className="font-medium">
-                    <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                    Facebook
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="text-center mt-6">
-            <p className="text-xs text-muted-foreground">
-              {activeTab === 'login' ? "Don't have an account? " : "Already have an account? "}
-              <button
-                  onClick={() => setActiveTab(activeTab === 'login' ? 'register' : 'login')}
-                  className="text-primary hover:text-primary-glow underline-offset-4 hover:underline transition-colors duration-200 font-medium"
-              >
-                {activeTab === 'login' ? 'Sign up here' : 'Sign in here'}
-              </button>
-            </p>
-          </div>
-        </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
+    </div>
   );
 };
 
