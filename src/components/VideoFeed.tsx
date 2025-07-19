@@ -133,8 +133,8 @@ const CommentsPanel: React.FC<CommentsPanelProps> = ({
 
   const base =
     variant === "desktop"
-      ? "hidden md:flex flex-col h-full w-[360px] bg-neutral-900/70 backdrop-blur-md border-l border-white/10 panel-animate"
-      : "md:hidden fixed inset-x-0 bottom-0 h-[55%] z-30 flex flex-col bg-neutral-900/90 backdrop-blur-md border-t border-white/10 panel-animate";
+      ? "hidden md:flex flex-col h-full w-[360px] bg-neutral-900/70 backdrop-blur-md border-l border-white/10 panel-animate overflow-hidden" /* + */
+      : "md:hidden fixed inset-x-0 bottom-0 h-[55%] z-30 flex flex-col bg-neutral-900/90 backdrop-blur-md border-t border-white/10 panel-animate overflow-hidden rounded-t-2xl" /* + */;
 
   return (
     <div className={base}>
@@ -156,14 +156,14 @@ const CommentsPanel: React.FC<CommentsPanelProps> = ({
         </div>
         <button
           onClick={onClose}
-          className="w-6 h-6 md:w-8 md:h-8 rounded-full btn-glass flex items-center justify-center text-white"
+            className="w-6 h-6 md:w-8 md:h-8 rounded-full btn-glass flex items-center justify-center text-white"
           aria-label="Close comments"
         >
           <X className="w-4 h-4 md:w-5 md:h-5" />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 md:px-4 py-2 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto px-3 md:px-4 py-2 scrollbar-hide overscroll-contain" /* + */>
         {comments.map((c) => (
           <CommentItem key={c.id} comment={c} onLike={onLikeComment} />
         ))}
@@ -330,7 +330,7 @@ const VideoItem: React.FC<VideoItemProps> = ({
 
   return (
     <div className="relative w-full h-screen snap-start snap-always bg-black overflow-hidden flex items-center justify-center">
-      <div className="w-full h-full flex justify-center">
+      <div className="w-full h-full flex justify-center overflow-hidden" /* + */>
         <div
           className={
             "relative h-full flex items-center " +
@@ -338,14 +338,19 @@ const VideoItem: React.FC<VideoItemProps> = ({
               ? " md:grid md:grid-cols-[max-content_360px] md:items-center"
               : " justify-center")
           }
-          style={{ maxWidth: "calc(56vh + 360px)" }}
+          style={{
+            maxWidth: "calc(min(100vw,56vh + 360px))" /* + bảo vệ không vượt 100vw */,
+          }}
         >
           {/* VIDEO */}
           <div className="relative h-full flex">
-            <div className="relative h-full aspect-[9/16] max-h-full w-auto">
+            <div
+              className="relative h-full aspect-[9/16] max-h-full w-auto max-w-[100vw] /* + */
+                         md:max-w-[min(100vw-360px,520px)] md:w-auto" /* + giới hạn khi có panel */
+            >
               <video
                 ref={videoRef}
-                className="absolute inset-0 h-full w-auto object-cover bg-black rounded-lg"
+                className="absolute inset-0 h-full w-auto max-w-full object-cover bg-black rounded-lg"
                 loop
                 muted={isMuted}
                 playsInline
@@ -451,7 +456,7 @@ const VideoItem: React.FC<VideoItemProps> = ({
                 </button>
               </div>
 
-              {/* Volume (Desktop only, top-right) */}
+              {/* Volume (Desktop only) */}
               <button
                 onClick={toggleMute}
                 aria-label="Toggle mute"
@@ -604,7 +609,7 @@ export const VideoFeed: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-screen overflow-y-auto snap-y snap-mandatory scrollbar-hide bg-black"
+      className="relative w-full h-screen overflow-y-auto snap-y snap-mandatory scrollbar-hide bg-black overscroll-y-none overflow-x-hidden" /* + */
       onScroll={handleScroll}
       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
     >
