@@ -19,14 +19,26 @@ import {
 import { allLocations } from '@/data/locations';
 import { useToast } from '@/hooks/use-toast';
 
-const DestinationDetails: React.FC = () => {
+interface DestinationDetailsProps {
+  destination?: LocationPoint;
+  onBack?: () => void;
+  mode?: 'view' | 'select';
+  onSelect?: (destination: LocationPoint) => void;
+}
+
+const DestinationDetails: React.FC<DestinationDetailsProps> = ({ 
+  destination: propDestination,
+  onBack,
+  mode = 'view',
+  onSelect
+}) => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isAddedToItinerary, setIsAddedToItinerary] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
 
-  const destination = allLocations.find(location => location.id === id);
+  const destination = propDestination || allLocations.find(location => location.id === id);
 
   if (!destination) {
     return (
@@ -78,12 +90,24 @@ const DestinationDetails: React.FC = () => {
       {/* Header */}
       <div className="relative">
         <div className="absolute top-4 left-4 z-10">
-          <Link to="/destinations">
-            <Button variant="secondary" size="sm" className="gap-2 bg-white/90 backdrop-blur-sm">
+          {onBack ? (
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className="gap-2 bg-white/90 backdrop-blur-sm"
+              onClick={onBack}
+            >
               <ArrowLeft className="w-4 h-4" />
               Quay lại
             </Button>
-          </Link>
+          ) : (
+            <Link to="/destinations">
+              <Button variant="secondary" size="sm" className="gap-2 bg-white/90 backdrop-blur-sm">
+                <ArrowLeft className="w-4 h-4" />
+                Quay lại
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Hero Image */}
@@ -123,23 +147,33 @@ const DestinationDetails: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Action Buttons */}
         <div className="flex gap-3 mb-8">
-          <Button
-            onClick={handleAddToItinerary}
-            disabled={isAddedToItinerary}
-            className="flex-1 gap-2"
-          >
-            {isAddedToItinerary ? (
-              <>
-                <Check className="w-4 h-4" />
-                Đã thêm vào lịch trình
-              </>
-            ) : (
-              <>
-                <Plus className="w-4 h-4" />
-                Thêm vào lịch trình
-              </>
-            )}
-          </Button>
+          {mode === 'select' && onSelect ? (
+            <Button
+              onClick={() => onSelect(destination)}
+              className="flex-1 gap-2"
+            >
+              <Check className="w-4 h-4" />
+              Chọn điểm đến này
+            </Button>
+          ) : (
+            <Button
+              onClick={handleAddToItinerary}
+              disabled={isAddedToItinerary}
+              className="flex-1 gap-2"
+            >
+              {isAddedToItinerary ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  Đã thêm vào lịch trình
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" />
+                  Thêm vào lịch trình
+                </>
+              )}
+            </Button>
+          )}
           
           <Button
             variant="outline"

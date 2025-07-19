@@ -30,6 +30,8 @@ export interface ItineraryStop {
   coordinates: [number, number];
   scheduledTime: string;
   duration: string; // e.g., "2 hours"
+  startedAt?: string; // HH:MM format
+  endedAt?: string; // HH:MM format
   challenges: Challenge[];
   posts: Post[];
   notes?: string;

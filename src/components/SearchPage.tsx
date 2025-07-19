@@ -8,13 +8,26 @@ import { Link, useNavigate } from 'react-router-dom';
 import { allLocations } from '@/data/locations';
 import { LocationPoint } from '@/types/map';
 import { useToast } from '@/hooks/use-toast';
+import DestinationDetails from './DestinationDetails';
 
-const SearchPage: React.FC = () => {
+interface SearchPageProps {
+  mode?: 'add' | 'select';
+  onDestinationSelect?: (destination: LocationPoint) => void;
+  showBackButton?: boolean;
+}
+
+const SearchPage: React.FC<SearchPageProps> = ({ 
+  mode = 'add', 
+  onDestinationSelect,
+  showBackButton = true 
+}) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [addedDestinations, setAddedDestinations] = useState<Set<string>>(new Set());
+  const [showDestinationDetails, setShowDestinationDetails] = useState(false);
+  const [selectedDestination, setSelectedDestination] = useState<LocationPoint | null>(null);
 
   const categories = [
     { id: 'all', name: 'Tất cả' },
@@ -30,30 +43,51 @@ const SearchPage: React.FC = () => {
   });
 
   const handleAddDestination = (location: LocationPoint) => {
-    setAddedDestinations(prev => new Set(prev).add(location.id));
-    toast({
-      title: "Đã thêm điểm đến",
-      description: `${location.name} đã được thêm vào lịch trình`,
-    });
+    if (mode === 'select' && onDestinationSelect) {
+      onDestinationSelect(location);
+    } else {
+      setAddedDestinations(prev => new Set(prev).add(location.id));
+      toast({
+        title: "Đã thêm điểm đến",
+        description: `${location.name} đã được thêm vào lịch trình`,
+      });
+    }
   };
 
   const handleViewDetails = (locationId: string) => {
-    navigate(`/destination/${locationId}`);
+    const location = allLocations.find(l => l.id === locationId);
+    if (location) {
+      setSelectedDestination(location);
+      setShowDestinationDetails(true);
+    }
   };
+
+  if (showDestinationDetails && selectedDestination) {
+    return (
+      <DestinationDetails 
+        destination={selectedDestination}
+        onBack={() => setShowDestinationDetails(false)}
+        mode={mode}
+        onSelect={mode === 'select' ? onDestinationSelect : undefined}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-nature">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-4 mb-6">
-            <Link to="/itinerary">
-              <Button variant="ghost" size="sm" className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Quay lại lịch trình
-              </Button>
-            </Link>
-          </div>
+          {showBackButton && (
+            <div className="flex items-center gap-4 mb-6">
+              <Link to="/itinerary">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <ArrowLeft className="w-4 h-4" />
+                  Quay lại lịch trình
+                </Button>
+              </Link>
+            </div>
+          )}
 
           <div className="flex items-center gap-3 mb-6">
             <div className="p-3 bg-primary/10 rounded-xl">
@@ -182,12 +216,12 @@ const SearchPage: React.FC = () => {
                             {addedDestinations.has(location.id) ? (
                               <>
                                 <Check className="w-4 h-4" />
-                                Đã thêm
+                                {mode === 'select' ? 'Đã chọn' : 'Đã thêm'}
                               </>
                             ) : (
                               <>
                                 <Plus className="w-4 h-4" />
-                                Thêm vào lịch trình
+                                {mode === 'select' ? 'Chọn điểm đến' : 'Thêm vào lịch trình'}
                               </>
                             )}
                           </Button>
