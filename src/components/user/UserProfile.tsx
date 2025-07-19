@@ -3,35 +3,31 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Edit3, 
-  MapPin, 
-  Mail, 
-  Calendar, 
-  Heart, 
-  MessageCircle, 
-  Camera, 
+import {
+  Edit3,
+  MapPin,
+  Mail,
+  Calendar,
   Settings,
   Bell,
   Shield,
   LogOut,
   Trash2,
   Activity,
-  Star
 } from 'lucide-react';
 import EditProfile from './EditProfile';
 import ChangePassword from './ChangePassword';
 import AccountSettings from './AccountSettings';
 
 interface UserData {
-  id: string;
+  id?: string | number;
   name: string;
   email: string;
-  bio: string;
-  avatar: string;
-  joinDate: string;
-  location: string;
-  stats: {
+  bio?: string;
+  avatar?: string;
+  joinDate?: string;
+  location?: string;
+  stats?: {
     comments: number;
     likes: number;
     uploads: number;
@@ -53,55 +49,84 @@ const UserProfile = () => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showAccountSettings, setShowAccountSettings] = useState(false);
 
-  // Mock user data
-  const [userData, setUserData] = useState<UserData>({
-    id: '1',
-    name: 'Minh Nguyen',
-    email: 'minh.nguyen@example.com',
-    bio: 'Adventure enthusiast exploring the beautiful caves and landscapes of Quang Binh. Love capturing moments and sharing travel tips with fellow explorers! 🌿',
-    avatar: '/api/placeholder/120/120',
-    joinDate: '2023-05-15',
-    location: 'Dong Hoi, Quang Binh',
-    stats: {
-      comments: 45,
-      likes: 128,
-      uploads: 23,
-      reviews: 15
-    }
-  });
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
 
-  // Activity History state (dữ liệu thật từ API)
+  // ACTIVITY HISTORY: Luôn fetch với userId=1 để test
   const [activityHistory, setActivityHistory] = useState<ActivityHistoryItem[]>([]);
   const [activityLoading, setActivityLoading] = useState(true);
 
-  // Fetch activity history
+  // User Profile - Giữ nguyên hoặc sửa tuỳ ý
   useEffect(() => {
-    const userId = 1; // set cứng theo yêu cầu
     const token = localStorage.getItem('accessToken');
-    setActivityLoading(true);
-    fetch(`http://localhost:8081/api/user/${userId}/activity-history`, {
+    setLoadingUser(true);
+    fetch('http://localhost:8081/api/user/profile', {
       headers: {
-        'Authorization': 'Bearer ' + token
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
       }
     })
       .then(res => {
         if (!res.ok) throw new Error('Unauthorized');
         return res.json();
       })
-      .then(data => setActivityHistory(data))
-      .catch(err => {
-        console.error(err);
-        setActivityHistory([]);
+      .then(data => {
+        setUserData({
+          id: data.id || '',
+          name: data.fullname || data.name || '',
+          email: data.email || '',
+          bio: data.bio || '',
+          avatar: data.avatar || '/api/placeholder/120/120',
+          joinDate: data.joinDate || '',
+          location: data.location || '',
+          stats: {
+            comments: data.comments ?? 0,
+            likes: data.likes ?? 0,
+            uploads: data.uploads ?? 0,
+            reviews: data.reviews ?? 0
+          }
+        });
       })
-      .finally(() => setActivityLoading(false));
+      .catch(err => {
+        setUserData(null);
+        console.error('Error fetching user profile:', err);
+      })
+      .finally(() => setLoadingUser(false));
   }, []);
+
+  // Chỉ sửa phần này: luôn dùng userId=1 cho chắc chắn (test đúng API như Postman)
+  useEffect(() => {
+  // Chờ khi userData có id mới gọi fetch!
+  if (!userData || !userData.id) return;
+
+  setActivityLoading(true);
+  const token = localStorage.getItem('accessToken');
+  fetch(`http://localhost:8081/api/user/${userData.id}/activity-history`, {
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Unauthorized');
+      return res.json();
+    })
+    .then(data => {
+      setActivityHistory(Array.isArray(data) ? data : []);
+    })
+    .catch(err => {
+      setActivityHistory([]);
+      console.error('Error fetching activity history:', err);
+    })
+    .finally(() => setActivityLoading(false));
+}, [userData]); // <<--- Dùng userData làm dependency
 
   const getActivityIcon = () => (
     <MapPin className="h-4 w-4" />
   );
 
   const handleUpdateProfile = (updatedData: Partial<UserData>) => {
-    setUserData(prev => ({ ...prev, ...updatedData }));
+    setUserData(prev => ({ ...(prev || {}), ...updatedData }));
     setShowEditProfile(false);
   };
 
@@ -111,69 +136,77 @@ const UserProfile = () => {
         {/* Header Card */}
         <Card className="shadow-card bg-gradient-card border-border/50">
           <CardHeader className="pb-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              {/* Avatar Section */}
-              <div className="relative">
-                <Avatar className="h-24 w-24 border-4 border-primary/20 shadow-soft">
-                  <AvatarImage src={userData.avatar} alt={userData.name} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-2xl font-semibold">
-                    {userData.name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="absolute -bottom-2 -right-2 bg-primary rounded-full p-2 shadow-glow">
-                  <MapPin className="h-4 w-4 text-primary-foreground" />
+            {loadingUser ? (
+              <div className="py-12 text-center text-muted-foreground">Loading user profile...</div>
+            ) : !userData ? (
+              <div className="py-12 text-center text-red-500">Failed to load user profile.</div>
+            ) : (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                {/* Avatar Section */}
+                <div className="relative">
+                  <Avatar className="h-24 w-24 border-4 border-primary/20 shadow-soft">
+                    <AvatarImage src={userData.avatar} alt={userData.name} />
+                    <AvatarFallback className="bg-primary/10 text-primary text-2xl font-semibold">
+                      {userData.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute -bottom-2 -right-2 bg-primary rounded-full p-2 shadow-glow">
+                    <MapPin className="h-4 w-4 text-primary-foreground" />
+                  </div>
                 </div>
+                {/* User Info */}
+                <div className="flex-1 space-y-3">
+                  <div>
+                    <h1 className="text-2xl font-bold text-primary">{userData.name}</h1>
+                    <div className="flex items-center gap-2 text-muted-foreground mt-1">
+                      <Mail className="h-4 w-4" />
+                      <span className="text-sm">{userData.email}</span>
+                    </div>
+                    {userData.location && (
+                      <div className="flex items-center gap-2 text-muted-foreground mt-1">
+                        <MapPin className="h-4 w-4" />
+                        <span className="text-sm">{userData.location}</span>
+                      </div>
+                    )}
+                  </div>
+                  {userData.bio && (
+                    <p className="text-muted-foreground text-sm leading-relaxed max-w-md">
+                      {userData.bio}
+                    </p>
+                  )}
+                  {/* Stats */}
+                  {userData.stats && (
+                    <div className="flex flex-wrap gap-4 pt-2">
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-primary">{userData.stats.comments}</div>
+                        <div className="text-xs text-muted-foreground">Comments</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-primary">{userData.stats.likes}</div>
+                        <div className="text-xs text-muted-foreground">Likes</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-primary">{userData.stats.uploads}</div>
+                        <div className="text-xs text-muted-foreground">Uploads</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-primary">{userData.stats.reviews}</div>
+                        <div className="text-xs text-muted-foreground">Reviews</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {/* Edit Button */}
+                <Button
+                  variant="default"
+                  className="self-start"
+                  onClick={() => setShowEditProfile(true)}
+                >
+                  <Edit3 className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
               </div>
-
-              {/* User Info */}
-              <div className="flex-1 space-y-3">
-                <div>
-                  <h1 className="text-2xl font-bold text-primary">{userData.name}</h1>
-                  <div className="flex items-center gap-2 text-muted-foreground mt-1">
-                    <Mail className="h-4 w-4" />
-                    <span className="text-sm">{userData.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground mt-1">
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-sm">{userData.location}</span>
-                  </div>
-                </div>
-
-                <p className="text-muted-foreground text-sm leading-relaxed max-w-md">
-                  {userData.bio}
-                </p>
-
-                {/* Stats */}
-                <div className="flex flex-wrap gap-4 pt-2">
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-primary">{userData.stats.comments}</div>
-                    <div className="text-xs text-muted-foreground">Comments</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-primary">{userData.stats.likes}</div>
-                    <div className="text-xs text-muted-foreground">Likes</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-primary">{userData.stats.uploads}</div>
-                    <div className="text-xs text-muted-foreground">Uploads</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-primary">{userData.stats.reviews}</div>
-                    <div className="text-xs text-muted-foreground">Reviews</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Edit Button */}
-              <Button 
-                variant="default"
-                className="self-start"
-                onClick={() => setShowEditProfile(true)}
-              >
-                <Edit3 className="h-4 w-4 mr-2" />
-                Edit Profile
-              </Button>
-            </div>
+            )}
           </CardHeader>
         </Card>
 
@@ -226,16 +259,9 @@ const UserProfile = () => {
                     ))
                   )}
                 </div>
-                {/* Load more button nếu cần (mock) */}
-                {/* <div className="text-center pt-4">
-                  <Button variant="outline" className="w-full sm:w-auto">
-                    Load More Activity
-                  </Button>
-                </div> */}
               </TabsContent>
-
-              {/* Account Settings Tab */}
-              <TabsContent value="settings" className="space-y-4 mt-4">
+              {/* Account Settings Tab giữ nguyên */}
+               <TabsContent value="settings" className="space-y-4 mt-4">
                 <div className="grid gap-3">
                   {/* Change Password */}
                   <div className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-background/50 hover:bg-accent/50 transition-colors duration-200">
@@ -327,19 +353,21 @@ const UserProfile = () => {
         </Card>
 
         {/* Join Date */}
-        <div className="text-center">
-          <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
-            <Calendar className="h-4 w-4" />
-            <span>Member since {new Date(userData.joinDate).toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long' 
-            })}</span>
+        {userData && userData.joinDate && (
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
+              <Calendar className="h-4 w-4" />
+              <span>Member since {new Date(userData.joinDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long'
+              })}</span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Modals */}
-      {showEditProfile && (
+      {showEditProfile && userData && (
         <EditProfile
           userData={userData}
           onSave={handleUpdateProfile}
