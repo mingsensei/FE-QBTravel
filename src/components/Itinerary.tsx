@@ -10,10 +10,26 @@ const Itinerary: React.FC = () => {
   const [selectedItinerary, setSelectedItinerary] = useState<ItineraryType | null>(null);
   const [itineraries, setItineraries] = useState<ItineraryType[]>([mockItinerary]);
 
-  const handleSelectItinerary = (itinerary: ItineraryType) => {
-    setSelectedItinerary(itinerary);
+  const handleSelectItinerary = async (itinerary: ItineraryType) => {
+  try {
+    const res = await fetch(`http://localhost:8081/api/itinerary-stop/by-itinerary/${itinerary.id}`);
+    if (!res.ok) throw new Error('Failed to fetch stops');
+
+    const stops: ItineraryStop[] = await res.json();
+
+    const itineraryWithStops = {
+      ...itinerary,
+      stops: stops
+    };
+
+    setSelectedItinerary(itineraryWithStops);
     setCurrentView('details');
-  };
+  } catch (error) {
+    console.error('Error fetching stops:', error);
+    alert('Không thể tải chi tiết hành trình');
+  }
+};
+
 
   const handleBackToList = () => {
     setCurrentView('list');

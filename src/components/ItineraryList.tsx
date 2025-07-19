@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, MapPin, Plus, Eye } from 'lucide-react';
 import { Itinerary } from '@/types/itinerary';
-import { mockItinerary } from '@/data/mockItinerary';
 
 interface ItineraryListProps {
   onSelectItinerary: (itinerary: Itinerary) => void;
@@ -12,8 +10,28 @@ interface ItineraryListProps {
 }
 
 const ItineraryList: React.FC<ItineraryListProps> = ({ onSelectItinerary, onCreateNew }) => {
-  // Mock data - in real app this would come from API
-  const [itineraries] = useState<Itinerary[]>([mockItinerary]);
+  const [itineraries, setItineraries] = useState<Itinerary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchItineraries = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('http://localhost:8081/api/itinerary/by-user/2');
+        if (!res.ok) throw new Error('Không thể tải dữ liệu lịch trình');
+        const data = await res.json();
+        
+        setItineraries(data);
+      } catch (err: any) {
+        setError(err.message || 'Đã xảy ra lỗi khi gọi API');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItineraries();
+  }, []);
 
   const formatDateRange = (startDate: string, endDate: string) => {
     const start = new Date(startDate).toLocaleDateString();
@@ -78,35 +96,10 @@ const ItineraryList: React.FC<ItineraryListProps> = ({ onSelectItinerary, onCrea
                   </div>
                 </div>
 
-                {/* Stats */}
-                <div className="flex items-center gap-4">
-                  <Badge variant="secondary" className="text-xs">
-                    {itinerary.stops.length} điểm đến
-                  </Badge>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin className="w-3 h-3" />
-                    <span>Quảng Bình</span>
-                  </div>
-                </div>
-
-                {/* Preview of first few stops */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium">Điểm đến:</h4>
-                  <div className="space-y-1">
-                    {itinerary.stops.slice(0, 3).map((stop, index) => (
-                      <div key={stop.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span className="w-4 h-4 rounded-full bg-primary/20 text-primary text-[10px] flex items-center justify-center font-medium">
-                          {index + 1}
-                        </span>
-                        <span className="truncate">{stop.name}</span>
-                      </div>
-                    ))}
-                    {itinerary.stops.length > 3 && (
-                      <div className="text-xs text-muted-foreground ml-6">
-                        +{itinerary.stops.length - 3} điểm đến khác
-                      </div>
-                    )}
-                  </div>
+                {/* Location placeholder */}
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <MapPin className="w-3 h-3" />
+                  <span>Quảng Bình</span>
                 </div>
 
                 {/* Action Button */}
@@ -124,7 +117,7 @@ const ItineraryList: React.FC<ItineraryListProps> = ({ onSelectItinerary, onCrea
         </div>
 
         {/* Empty State */}
-        {itineraries.length === 0 && (
+        {itineraries.length === 0 && !loading && (
           <div className="text-center py-16">
             <div className="w-24 h-24 rounded-full bg-gradient-nature mb-6 flex items-center justify-center mx-auto">
               <Calendar className="w-12 h-12 text-primary" />
