@@ -13,8 +13,11 @@ import {QuangBinhProducts} from "@/components/QuangBinhProducts.tsx";
 import Homepage from "@/components/Homepage.tsx";
 import {ThreeDMap} from "@/components/ThreeMap.tsx";
 import {UploadForm} from "@/components/UploadForm.tsx";
-import {DestinationsPage} from "@/components/destinations/DestinationsPage.tsx";
 
+import Itinerary from "@/components/Itinerary.tsx";
+import SearchPage from "@/components/SearchPage.tsx";
+import DestinationDetails from "@/components/DestinationDetails.tsx";
+import {DestinationsPage} from "@/components/destinations/DestinationsPage.tsx";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -31,6 +34,11 @@ const App = () => (
               <Route path="/destinations" element={<DestinationsPage />} />
               <Route path="/products" element={<QuangBinhProducts/>}/>
               <Route path="/upload" element={<UploadForm/>}/>
+              {/* --- Thêm các route mới cho luồng kế hoạch chuyến đi --- */}
+              <Route path="/itinerary" element={<Itinerary />} />
+              <Route path="/search" element={<SearchPage />} />
+              {/* Route động cho trang chi tiết, :id là một parameter */}
+              <Route path="/destination/:id" element={<DestinationDetails />} />
 
             </Route>
             <Route path="/map" element={<ThreeDMap/>}/>
