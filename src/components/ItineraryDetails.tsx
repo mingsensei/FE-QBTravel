@@ -105,7 +105,7 @@ const ItineraryDetails: React.FC<ItineraryDetailsProps> = ({
               <Calendar className="w-4 h-4" />
               <span>{itinerary.startDate} - {itinerary.endDate}</span>
             </div>
-            <Badge variant="secondary">{itinerary.stops.length} điểm đến</Badge>
+            <Badge variant="secondary">{itinerary.stops?.length || 0} điểm đến</Badge>
           </div>
 
           <Button onClick={onAddStop} className="gap-2">
@@ -116,14 +116,14 @@ const ItineraryDetails: React.FC<ItineraryDetailsProps> = ({
 
         {/* Stops List */}
         <div className="space-y-6">
-          {itinerary.stops.map((stop, index) => (
+          {(itinerary.stops || []).map((stop, index) => (
             <Card key={stop.id} className="overflow-hidden hover:shadow-md transition-shadow">
               <CardContent className="p-0">
                 <div className="flex flex-col lg:flex-row">
                   {/* Image */}
                   <div className="lg:w-1/3">
                     <img
-                      src={stop.image}
+                      src={stop.imgLink}
                       alt={stop.name}
                       className="w-full h-48 lg:h-full object-cover"
                     />
@@ -203,8 +203,8 @@ const ItineraryDetails: React.FC<ItineraryDetailsProps> = ({
                       </div>
                     </div>
 
-                    {/* Challenges */}
-                    {stop.challenges.length > 0 && (
+                    {/* Challenges - ĐÃ SỬA LỖI */}
+                    {stop.challenges?.length > 0 && (
                       <div className="mb-4">
                         <div className="flex items-center gap-2 mb-3">
                           <Target className="w-4 h-4 text-primary" />
@@ -257,7 +257,7 @@ const ItineraryDetails: React.FC<ItineraryDetailsProps> = ({
         </div>
 
         {/* Empty State */}
-        {itinerary.stops.length === 0 && (
+        {itinerary.stops?.length === 0 && (
           <div className="text-center py-16">
             <div className="w-24 h-24 rounded-full bg-gradient-nature mb-6 flex items-center justify-center mx-auto">
               <MapPin className="w-12 h-12 text-primary" />
