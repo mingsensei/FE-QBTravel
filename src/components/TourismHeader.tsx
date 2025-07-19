@@ -35,7 +35,7 @@ const TourismHeader = () => {
     { name: 'Map', href: '/map', icon: MapPin },
     { name: 'Experiences', href: '/experiences', icon: Camera },
     { name: 'Products', href: '/products', icon: Gift },
-    { name: 'Events', href: '/events', icon: Calendar },
+    { name: 'Itinerary', href: '/itinerary', icon: Calendar },
     { name: 'About Quang Binh', href: '/about', icon: Info },
     { name: 'Contact', href: '/contact', icon: Phone },
   ];
