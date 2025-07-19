@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Play, Heart, MessageCircle, Share2, X, ChevronLeft, ChevronRight, MapPin, Star, Clock } from 'lucide-react';
 import { Button } from './ui/button';
 import { VideoFeed } from './VideoFeed';
+import { ChatBot } from './chatbot';
 
 const Homepage = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [showVideoFeed, setShowVideoFeed] = useState(false);
-
+  const [showChatBot, setShowChatBot] = useState(true);
+  const handleGlobalVideoPlaying = useCallback((playing: boolean) => {
+    if (playing) {
+      setShowChatBot(false);
+    } else {
+      setShowChatBot(true);
+    }
+  }, []);
   const famousPlaces = [
     {
       id: 1,
@@ -125,6 +133,7 @@ const Homepage = () => {
 
   return (
     <div className="min-h-screen">
+      {showChatBot && <ChatBot />}
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div 

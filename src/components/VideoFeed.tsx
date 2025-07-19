@@ -8,6 +8,7 @@ import {
   VolumeX,
   X,
 } from "lucide-react";
+import clsx from "clsx";
 
 /* ========== Types ========== */
 interface Comment {
@@ -83,12 +84,16 @@ const CommentItem: React.FC<{
       <div className="flex items-center space-x-4">
         <button
           onClick={() => onLike(comment.id)}
-          className={`flex items-center space-x-1 text-xs ${
+          className={clsx(
+            "flex items-center space-x-1 text-xs",
             comment.isLiked ? "text-like" : "text-muted-foreground"
-          }`}
+          )}
         >
           <Heart
-            className={`w-3 h-3 ${comment.isLiked ? "fill-current" : ""}`}
+            className={clsx(
+              "w-3 h-3",
+              comment.isLiked && "fill-current"
+            )}
           />
           <span>{comment.likes}</span>
         </button>
@@ -128,12 +133,11 @@ const CommentsPanel: React.FC<CommentsPanelProps> = ({
 
   const base =
     variant === "desktop"
-      ? "hidden md:flex flex-col h-full w-[360px] bg-neutral-900/70 backdrop-blur-md border-l border-white/10"
-      : "md:hidden fixed inset-x-0 bottom-0 h-[55%] z-30 flex flex-col bg-neutral-900/90 backdrop-blur-md border-t border-white/10";
+      ? "hidden md:flex flex-col h-full w-[360px] bg-neutral-900/70 backdrop-blur-md border-l border-white/10 panel-animate"
+      : "md:hidden fixed inset-x-0 bottom-0 h-[55%] z-30 flex flex-col bg-neutral-900/90 backdrop-blur-md border-t border-white/10 panel-animate";
 
   return (
     <div className={base}>
-      {/* Header */}
       <div className="flex items-center justify-between p-3 md:p-4 border-b border-white/10">
         <div className="flex items-center space-x-3">
           <img
@@ -153,19 +157,18 @@ const CommentsPanel: React.FC<CommentsPanelProps> = ({
         <button
           onClick={onClose}
           className="w-6 h-6 md:w-8 md:h-8 rounded-full btn-glass flex items-center justify-center text-white"
+          aria-label="Close comments"
         >
           <X className="w-4 h-4 md:w-5 md:h-5" />
         </button>
       </div>
 
-      {/* List */}
       <div className="flex-1 overflow-y-auto px-3 md:px-4 py-2 scrollbar-hide">
         {comments.map((c) => (
           <CommentItem key={c.id} comment={c} onLike={onLikeComment} />
         ))}
       </div>
 
-      {/* Input */}
       <div className="p-3 md:p-4 border-t border-white/10">
         <div className="flex items-center space-x-2 md:space-x-3">
           <img
@@ -196,18 +199,19 @@ const CommentsPanel: React.FC<CommentsPanelProps> = ({
         </div>
       </div>
 
-      {/* Bottom actions */}
       <div className="flex items-center justify-around p-3 md:p-4 border-t border-white/10">
         <button
           onClick={onToggleLikeVideo}
-          className={`flex items-center space-x-2 px-3 md:px-4 py-2 rounded-full btn-glass ${
+          className={clsx(
+            "flex items-center space-x-2 px-3 md:px-4 py-2 rounded-full btn-glass",
             video.isLiked ? "text-like" : "text-white"
-          }`}
+          )}
         >
           <Heart
-            className={`w-4 h-4 md:w-5 md:h-5 ${
-              video.isLiked ? "fill-current" : ""
-            }`}
+            className={clsx(
+              "w-4 h-4 md:w-5 md:h-5",
+              video.isLiked && "fill-current"
+            )}
           />
           <span className="text-xs md:text-sm">
             {video.likes > 999
@@ -288,14 +292,11 @@ const VideoItem: React.FC<VideoItemProps> = ({
     },
   ];
 
-  /* Auto play/pause */
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
     if (isActive) {
-      el.play()
-        .then(() => setIsPlaying(true))
-        .catch(() => {});
+      el.play().then(() => setIsPlaying(true)).catch(() => {});
     } else {
       el.pause();
       el.currentTime = 0;
@@ -315,10 +316,7 @@ const VideoItem: React.FC<VideoItemProps> = ({
       videoRef.current.pause();
       setIsPlaying(false);
     } else {
-      videoRef.current
-        .play()
-        .then(() => setIsPlaying(true))
-        .catch(() => {});
+      videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
     }
   };
 
@@ -326,11 +324,13 @@ const VideoItem: React.FC<VideoItemProps> = ({
     console.log("Like comment:", cid);
   };
 
+  const handleVideoTap = () => {
+    togglePlayPause();
+  };
+
   return (
     <div className="relative w-full h-screen snap-start snap-always bg-black overflow-hidden flex items-center justify-center">
-      {/* Outer center wrapper: centers group horizontally */}
       <div className="w-full h-full flex justify-center">
-        {/* Inner responsive container: when showComments => grid with max-content video & 360px panel, whole group centered */}
         <div
           className={
             "relative h-full flex items-center " +
@@ -338,10 +338,7 @@ const VideoItem: React.FC<VideoItemProps> = ({
               ? " md:grid md:grid-cols-[max-content_360px] md:items-center"
               : " justify-center")
           }
-          /* Optional max width clamp: video width (~height * 9/16) + 360 panel + spacing */
-          style={{
-            maxWidth: "calc(56vh + 360px)",
-          }} /* 56vh ~ (1/ (16/9)) * 100vh * some factor; điều chỉnh nếu cần */
+          style={{ maxWidth: "calc(56vh + 360px)" }}
         >
           {/* VIDEO */}
           <div className="relative h-full flex">
@@ -352,13 +349,12 @@ const VideoItem: React.FC<VideoItemProps> = ({
                 loop
                 muted={isMuted}
                 playsInline
-                onClick={togglePlayPause}
+                onClick={handleVideoTap}
                 poster={`https://picsum.photos/720/1280?random=${video.id}`}
               >
                 <source src={video.url} type="video/mp4" />
               </video>
 
-              {/* Gradient */}
               <div className="absolute inset-0 gradient-overlay pointer-events-none rounded-lg" />
 
               {/* User info */}
@@ -396,24 +392,26 @@ const VideoItem: React.FC<VideoItemProps> = ({
                 </p>
               </div>
 
-              {/* Action buttons (hide desktop if panel open) */}
+              {/* Action buttons */}
               <div
-                className={`absolute right-4 bottom-4 flex flex-col space-y-4 md:space-y-6 z-10 ${
-                  showComments ? "md:hidden" : ""
-                }`}
+                className={clsx(
+                  "absolute right-4 bottom-4 flex flex-col space-y-4 md:space-y-6 z-10",
+                  showComments && "md:hidden"
+                )}
               >
-                {/* Like */}
                 <div className="flex flex-col items-center space-y-1">
                   <button
                     onClick={() => onToggleLike(video.id)}
-                    className={`action-btn w-10 h-10 md:w-12 md:h-12 rounded-full btn-glass flex items-center justify-center ${
+                    className={clsx(
+                      "action-btn w-10 h-10 md:w-12 md:h-12 rounded-full btn-glass flex items-center justify-center",
                       video.isLiked ? "text-like" : "text-white"
-                    }`}
+                    )}
                   >
                     <Heart
-                      className={`w-5 h-5 md:w-7 md:h-7 ${
-                        video.isLiked ? "fill-current" : ""
-                      }`}
+                      className={clsx(
+                        "w-5 h-5 md:w-7 md:h-7",
+                        video.isLiked && "fill-current"
+                      )}
                     />
                   </button>
                   <span className="text-white text-xs font-medium">
@@ -422,7 +420,6 @@ const VideoItem: React.FC<VideoItemProps> = ({
                       : video.likes}
                   </span>
                 </div>
-                {/* Comment */}
                 <div className="flex flex-col items-center space-y-1">
                   <button
                     onClick={() => onOpenComments(video)}
@@ -436,7 +433,6 @@ const VideoItem: React.FC<VideoItemProps> = ({
                       : video.comments}
                   </span>
                 </div>
-                {/* Share */}
                 <div className="flex flex-col items-center space-y-1">
                   <button
                     onClick={() => onShare(video.id)}
@@ -450,21 +446,21 @@ const VideoItem: React.FC<VideoItemProps> = ({
                       : video.shares}
                   </span>
                 </div>
-                {/* More */}
                 <button className="action-btn w-10 h-10 md:w-12 md:h-12 rounded-full btn-glass flex items-center justify-center text-white">
                   <MoreVertical className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
               </div>
 
-              {/* Volume */}
+              {/* Volume (Desktop only, top-right) */}
               <button
                 onClick={toggleMute}
-                className="absolute top-4 right-4 w-8 h-8 md:w-10 md:h-10 rounded-full btn-glass flex items-center justify-center text-white z-10"
+                aria-label="Toggle mute"
+                className="hidden md:flex absolute top-4 right-4 w-10 h-10 rounded-full btn-glass items-center justify-center text-white z-10"
               >
                 {isMuted ? (
-                  <VolumeX className="w-4 h-4 md:w-5 md:h-5" />
+                  <VolumeX className="w-5 h-5" />
                 ) : (
-                  <Volume2 className="w-4 h-4 md:w-5 md:h-5" />
+                  <Volume2 className="w-5 h-5" />
                 )}
               </button>
 
@@ -479,7 +475,6 @@ const VideoItem: React.FC<VideoItemProps> = ({
             </div>
           </div>
 
-          {/* COMMENTS DESKTOP */}
           {showComments && (
             <CommentsPanel
               video={video}
@@ -492,7 +487,6 @@ const VideoItem: React.FC<VideoItemProps> = ({
             />
           )}
 
-          {/* COMMENTS MOBILE */}
           {showComments && (
             <CommentsPanel
               video={video}
