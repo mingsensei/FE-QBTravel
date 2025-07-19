@@ -5,6 +5,7 @@ import ItineraryList from './ItineraryList';
 import ItineraryDetails from './ItineraryDetails';
 import AddStopFlow from './AddStopFlow';
 import TravelPlannerAI from './chatbot/TravelPlanAI';
+import { Sparkles } from 'lucide-react';
 
 const Itinerary: React.FC = () => {
   const [currentView, setCurrentView] = useState<'list' | 'details' | 'addStop' | 'aiPlanner'>('list');
@@ -15,14 +16,9 @@ const Itinerary: React.FC = () => {
     try {
       const res = await fetch(`http://localhost:8081/api/itinerary-stop/by-itinerary/${itinerary.id}`);
       if (!res.ok) throw new Error('Failed to fetch stops');
-
       const stops: ItineraryStop[] = await res.json();
 
-      const itineraryWithStops = {
-        ...itinerary,
-        stops: stops
-      };
-
+      const itineraryWithStops = { ...itinerary, stops };
       setSelectedItinerary(itineraryWithStops);
       setCurrentView('details');
     } catch (error) {
@@ -45,79 +41,86 @@ const Itinerary: React.FC = () => {
   };
 
   const handleCreateNewItinerary = () => {
-    // TODO: Implement create new itinerary flow
     console.log('Create new itinerary');
   };
 
-  // NEW: Handle AI Planner
   const handleOpenAIPlanner = () => {
     setCurrentView('aiPlanner');
   };
 
   const handleAddStopToItinerary = (stop: Omit<ItineraryStop, 'id' | 'challenges' | 'posts'>) => {
     if (!selectedItinerary) return;
-
     const newStop: ItineraryStop = {
       ...stop,
       id: `stop-${Date.now()}`,
       challenges: [],
       posts: []
     };
-
     const updatedItinerary = {
       ...selectedItinerary,
       stops: [...selectedItinerary.stops, newStop]
     };
-
-    setItineraries(prev => 
-      prev.map(itin => 
-        itin.id === selectedItinerary.id ? updatedItinerary : itin
-      )
+    setItineraries(prev =>
+      prev.map(itin => (itin.id === selectedItinerary.id ? updatedItinerary : itin))
     );
-    
     setSelectedItinerary(updatedItinerary);
     setCurrentView('details');
   };
 
   const handleUpdateStop = (stopId: string, updates: Partial<ItineraryStop>) => {
     if (!selectedItinerary) return;
-
     const updatedItinerary = {
       ...selectedItinerary,
       stops: selectedItinerary.stops.map(stop =>
         stop.id === stopId ? { ...stop, ...updates } : stop
       )
     };
-
-    setItineraries(prev => 
-      prev.map(itin => 
-        itin.id === selectedItinerary.id ? updatedItinerary : itin
-      )
+    setItineraries(prev =>
+      prev.map(itin => (itin.id === selectedItinerary.id ? updatedItinerary : itin))
     );
-    
     setSelectedItinerary(updatedItinerary);
   };
 
-  // Render based on current view
+  /**
+   * Nút mở AI Planner chỉ hiển thị ở view 'list' hoặc 'details'
+   * Bạn có thể đổi style (fixed, absolute, v.v.)
+   */
+  const AIPlannerButton = (
+    <button
+      onClick={handleOpenAIPlanner}
+      className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-3 rounded-xl shadow-lg hover:from-blue-500 hover:to-indigo-500 active:scale-[0.97] transition font-medium"
+    >
+      <Sparkles className="w-5 h-5" />
+      AI Planner
+    </button>
+  );
+
+  // Render theo currentView
   switch (currentView) {
     case 'list':
       return (
-        <ItineraryList
-          onSelectItinerary={handleSelectItinerary}
-          onCreateNew={handleCreateNewItinerary}
-        />
+        <>
+          <ItineraryList
+            onSelectItinerary={handleSelectItinerary}
+            onCreateNew={handleCreateNewItinerary}
+          />
+          {AIPlannerButton}
+        </>
       );
-    
+
     case 'details':
       return selectedItinerary ? (
-        <ItineraryDetails
-          itinerary={selectedItinerary}
-          onBack={handleBackToList}
-          onAddStop={handleAddStop}
-          onUpdateStop={handleUpdateStop}
-        />
+        <>
+          <ItineraryDetails
+            itinerary={selectedItinerary}
+            onBack={handleBackToList}
+            onAddStop={handleAddStop}
+            onUpdateStop={handleUpdateStop}
+          />
+          {AIPlannerButton}
+        </>
       ) : null;
-    
+
     case 'addStop':
       return (
         <AddStopFlow
@@ -125,14 +128,14 @@ const Itinerary: React.FC = () => {
           onAddStop={handleAddStopToItinerary}
         />
       );
-    
+
     case 'aiPlanner':
       return (
         <TravelPlannerAI
           onBack={handleBackToList}
         />
       );
-    
+
     default:
       return null;
   }
