@@ -18,6 +18,7 @@ import Itinerary from "@/components/Itinerary.tsx";
 import SearchPage from "@/components/SearchPage.tsx";
 import DestinationDetails from "@/components/DestinationDetails.tsx";
 import {DestinationsPage} from "@/components/destinations/DestinationsPage.tsx";
+import ProductDetailCard from "@/components/ProductDetailCard.tsx";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/search" element={<SearchPage />} />
               {/* Route động cho trang chi tiết, :id là một parameter */}
               <Route path="/destination/:id" element={<DestinationDetails />} />
+
 
             </Route>
             <Route path="/map" element={<ThreeDMap/>}/>
