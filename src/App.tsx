@@ -13,6 +13,7 @@ import {QuangBinhProducts} from "@/components/QuangBinhProducts.tsx";
 import Homepage from "@/components/Homepage.tsx";
 import {ThreeDMap} from "@/components/ThreeMap.tsx";
 import {UploadForm} from "@/components/UploadForm.tsx";
+import {DestinationsPage} from "@/components/destinations/DestinationsPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
               <Route path="/" element={<Homepage />} />
               <Route path="/user" element={<UserProfile />} />g
               <Route path="/destination-blog" element={<DestinationBlog />} />
+              <Route path="/destinations" element={<DestinationsPage />} />
               <Route path="/products" element={<QuangBinhProducts/>}/>
               <Route path="/upload" element={<UploadForm/>}/>
 
