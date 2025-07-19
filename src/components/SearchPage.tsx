@@ -1,65 +1,206 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-
-// Định nghĩa kiểu dữ liệu cho một địa điểm gợi ý
-interface SuggestedDestination {
-  id: number;
-  name: string;
-  type: string;
-}
-
-// Dữ liệu mẫu
-const suggestedDestinations: SuggestedDestination[] = [
-  { id: 1, name: 'Bãi biển Mỹ Khê', type: 'Bãi biển' },
-  { id: 2, name: 'Bà Nà Hills', type: 'Khu du lịch' },
-  { id: 3, name: 'Phố cổ Hội An', type: 'Di sản văn hóa' },
-  { id: 4, name: 'Ngũ Hành Sơn', type: 'Danh thắng' },
-];
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Search, ArrowLeft, MapPin, Star, Plus, Check } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { allLocations } from '@/data/locations';
+import { LocationPoint } from '@/types/map';
+import { useToast } from '@/hooks/use-toast';
 
 const SearchPage: React.FC = () => {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [addedDestinations, setAddedDestinations] = useState<Set<string>>(new Set());
+
+  const categories = [
+    { id: 'all', name: 'Tất cả' },
+    { id: 'attraction', name: 'Danh lam' },
+    { id: 'craft-village', name: 'Làng nghề' }
+  ];
+
+  const filteredLocations = allLocations.filter(location => {
+    const matchesSearch = location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         location.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || location.type === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const handleAddDestination = (location: LocationPoint) => {
+    setAddedDestinations(prev => new Set(prev).add(location.id));
+    toast({
+      title: "Đã thêm điểm đến",
+      description: `${location.name} đã được thêm vào lịch trình`,
+    });
+  };
+
+  const handleViewDetails = (locationId: string) => {
+    navigate(`/destination/${locationId}`);
+  };
+
   return (
-    <div className="bg-slate-50 min-h-screen font-sans">
-      {/* Header với nút quay lại */}
-      <header className="bg-white p-4 border-b border-slate-200 flex items-center gap-4 sticky top-0 z-10">
-        <Link to="/itinerary" className="text-blue-500 font-semibold text-lg">
-          ‹ Quay lại
-        </Link>
-        <h1 className="text-xl font-bold text-slate-800 text-center flex-grow">Tìm Địa Điểm</h1>
-      </header>
-
-      <main className="p-5">
-        {/* Thanh tìm kiếm */}
-        <div className="relative mb-6">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-            </svg>
+    <div className="min-h-screen bg-gradient-nature">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-6">
+            <Link to="/itinerary">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                Quay lại lịch trình
+              </Button>
+            </Link>
           </div>
-          <input
-            type="text"
-            placeholder="Tìm kiếm bãi biển, núi, thành phố..."
-            className="w-full bg-white pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-          />
-        </div>
 
-        {/* Danh sách kết quả */}
-        <div>
-          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Gợi ý cho bạn</h2>
-          <div className="space-y-3">
-            {suggestedDestinations.map((dest) => (
-              // Mỗi item là một Link đến trang chi tiết với ID tương ứng
-              <Link
-                key={dest.id}
-                to={`/destination/${dest.id}`}
-                className="block bg-white p-5 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-primary/10 rounded-xl">
+              <Search className="w-8 h-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                Tìm kiếm điểm đến
+              </h1>
+              <p className="text-muted-foreground">
+                Khám phá và thêm điểm đến mới vào lịch trình của bạn
+              </p>
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              placeholder="Tìm kiếm địa điểm, hoạt động..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Category Filter */}
+          <div className="flex gap-2 mb-6">
+            {categories.map((category) => (
+              <Button
+                key={category.id}
+                variant={selectedCategory === category.id ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category.id)}
               >
-                <h3 className="text-lg font-bold text-slate-800">{dest.name}</h3>
-                <p className="text-sm font-semibold text-blue-500">{dest.type}</p>
-              </Link>
+                {category.name}
+              </Button>
             ))}
           </div>
         </div>
-      </main>
+
+        {/* Results */}
+        <div className="space-y-4">
+          {filteredLocations.length === 0 ? (
+            <div className="text-center py-12">
+              <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">Không tìm thấy kết quả</h3>
+              <p className="text-muted-foreground">
+                Thử tìm kiếm với từ khóa khác hoặc chọn danh mục khác
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-6">
+              {filteredLocations.map((location) => (
+                <Card key={location.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                  <CardContent className="p-0">
+                    <div className="flex flex-col md:flex-row">
+                      {/* Image */}
+                      <div className="md:w-80 h-48 md:h-auto">
+                        <img
+                          src={location.images[0]}
+                          alt={location.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant="secondary">
+                                {location.category}
+                              </Badge>
+                              {location.rating && (
+                                <div className="flex items-center gap-1 text-sm">
+                                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                                  <span>{location.rating}</span>
+                                </div>
+                              )}
+                            </div>
+                            <h3 className="text-xl font-semibold mb-2">{location.name}</h3>
+                            <p className="text-muted-foreground mb-3 line-clamp-2">
+                              {location.description}
+                            </p>
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                              <MapPin className="w-3 h-3" />
+                              <span>{location.checkIns?.toLocaleString()} check-ins</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Highlights */}
+                        {location.highlights && (
+                          <div className="mb-4">
+                            <div className="flex flex-wrap gap-1">
+                              {location.highlights.slice(0, 3).map((highlight, index) => (
+                                <Badge key={index} variant="outline" className="text-xs">
+                                  {highlight}
+                                </Badge>
+                              ))}
+                              {location.highlights.length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{location.highlights.length - 3}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewDetails(location.id)}
+                          >
+                            Xem chi tiết
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleAddDestination(location)}
+                            disabled={addedDestinations.has(location.id)}
+                            className="gap-2"
+                          >
+                            {addedDestinations.has(location.id) ? (
+                              <>
+                                <Check className="w-4 h-4" />
+                                Đã thêm
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="w-4 h-4" />
+                                Thêm vào lịch trình
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
