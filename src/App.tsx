@@ -40,7 +40,7 @@ const App = () => (
               <Route path="/search" element={<SearchPage />} />
               {/* Route động cho trang chi tiết, :id là một parameter */}
               <Route path="/destination/:id" element={<DestinationDetails />} />
-
+              <Route path="/product-detail-card" element={<ProductDetailCard />} />
 
             </Route>
             <Route path="/map" element={<ThreeDMap/>}/>

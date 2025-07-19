@@ -3,6 +3,7 @@ import { Play, Heart, MessageCircle, Share2, X, ChevronLeft, ChevronRight, MapPi
 import { Button } from './ui/button';
 import { VideoFeed } from './VideoFeed';
 import { ChatBot } from './chatbot';
+import qbHeaderVideo from "@/assets/qbheader.webm";
 
 const Homepage = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -21,51 +22,52 @@ const Homepage = () => {
       id: 1,
       name: "Phong Nha Cave",
       description: "UNESCO World Heritage underground wonder",
-      image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&h=300&fit=crop&crop=entropy",
+      image: "https://www.bangghim.com/images/Cong-vao-dong-Phong-Nha.jpg",
       rating: 4.8
     },
     {
       id: 2,
       name: "Paradise Cave",
       description: "Magnificent limestone cave system",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop&crop=entropy",
+      image: "https://discoveryhotels.com.vn/sites/default/files/dong-thien-duong-2.jpg",
       rating: 4.9
     },
     {
       id: 3,
       name: "Nhat Le Beach",
       description: "Pristine white sand coastal paradise",
-      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=300&fit=crop&crop=entropy",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJJ7k7Hk_0RgyTtm1Brkh1DgYxnqpwxSdxVw&s",
       rating: 4.7
     },
     {
       id: 4,
       name: "Botanic Garden",
       description: "Lush tropical botanical sanctuary",
-      image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop&crop=entropy",
+      image: "https://thiennhienmoitruong.vn/upload/images/btv/btv/btv/vuon-phong.jpg",
       rating: 4.6
     },
     {
       id: 5,
       name: "Dark Cave",
       description: "Adventure cave with mud therapy",
-      image: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=300&fit=crop&crop=entropy",
+      image: "https://huesmiletravel.com.vn/wp-content/uploads/2019/08/kham-pha-hang-toi-quang-binh.jpg",
       rating: 4.5
     },
     {
       id: 6,
       name: "Quang Binh National Park",
       description: "Biodiverse protected wilderness area",
-      image: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=300&fit=crop&crop=entropy",
+      image: "https://bcp.cdnchinhphu.vn/Uploaded_VGP/duongngocvan/20180126/QBubg.jpg",
       rating: 4.8
     }
   ];
+
 
   const travelVideos = [
     {
       id: 1,
       title: "Exploring Phong Nha Caves",
-      thumbnail: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=300&h=400&fit=crop&crop=entropy",
+      thumbnail: "https://vmtravel.com.vn/wp-content/uploads/2022/12/Phong_Nha_2.jpg",
       duration: "2:45",
       likes: 1234,
       comments: 89,
@@ -74,7 +76,7 @@ const Homepage = () => {
     {
       id: 2,
       title: "Paradise Cave Adventure",
-      thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=400&fit=crop&crop=entropy",
+      thumbnail: "https://quangbinhtourism.gov.vn/wp-content/uploads/2021/10/Paradise-Cave-7000m-4-600x400.jpeg",
       duration: "3:20",
       likes: 2156,
       comments: 142,
@@ -83,7 +85,7 @@ const Homepage = () => {
     {
       id: 3,
       title: "Nhat Le Beach Sunset",
-      thumbnail: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=400&fit=crop&crop=entropy",
+      thumbnail: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFeCIZfbaLM-TmiO_jaaQ-885Gjly-8tVppA&s",
       duration: "1:30",
       likes: 987,
       comments: 56,
@@ -92,7 +94,7 @@ const Homepage = () => {
     {
       id: 4,
       title: "Jungle Trekking Guide",
-      thumbnail: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=400&fit=crop&crop=entropy",
+      thumbnail: "https://heritagevietnamairlines.cdn.vccloud.vn/wp-content/uploads/2021/07/750A1399.jpg",
       duration: "4:15",
       likes: 1876,
       comments: 203,
@@ -101,7 +103,7 @@ const Homepage = () => {
     {
       id: 5,
       title: "Dark Cave Mud Bath",
-      thumbnail: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=300&h=400&fit=crop&crop=entropy",
+      thumbnail: "https://phongnhadiscovery.com/sites/default/files/tambun.jpg",
       duration: "2:10",
       likes: 756,
       comments: 91,
@@ -136,21 +138,26 @@ const Homepage = () => {
       {showChatBot && <ChatBot />}
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1920&h=1080&fit=crop&crop=entropy')"
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60"></div>
-        </div>
-        
+        {/* Video Background */}
+        <video
+            className="absolute inset-0 w-full h-full object-cover"
+            src={qbHeaderVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+        />
+
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60"></div>
+
+        {/* Main Content */}
         <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
             Discover the Magic of
             <span className="block bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-              Quang Binh
-            </span>
+        Quang Binh
+      </span>
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto leading-relaxed">
             UNESCO World Heritage caves, pristine beaches, and untouched wilderness await your exploration
@@ -160,6 +167,7 @@ const Homepage = () => {
           </Button>
         </div>
       </section>
+
 
       {/* Famous Places Section */}
       <section className="py-16 bg-gradient-to-br from-green-50 to-emerald-50">
