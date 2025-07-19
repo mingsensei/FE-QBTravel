@@ -124,12 +124,85 @@ export const DestinationsPage: React.FC = () => {
           />
         </div>
 
+        {/* Featured Section */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Điểm đến nổi bật</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Large Featured Card */}
+            <div className="lg:col-span-2">
+              {allLocations[0] && (
+                <div className="relative h-[400px] rounded-2xl overflow-hidden group cursor-pointer">
+                  <img 
+                    src={allLocations[0].images[0]} 
+                    alt={allLocations[0].name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute top-4 left-4">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary text-primary-foreground">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                      </svg>
+                      Điểm du lịch
+                    </span>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <h3 className="text-2xl font-bold mb-2">{allLocations[0].name}</h3>
+                    <div className="flex items-center gap-4 text-sm text-white/90">
+                      <span>04/05/2024</span>
+                      <span>•</span>
+                      <span>1 min read</span>
+                      <span>•</span>
+                      <span>1428 Views</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Smaller Cards */}
+            <div className="space-y-6">
+              {allLocations.slice(1, 3).map((location) => (
+                <div key={location.id} className="relative h-[190px] rounded-2xl overflow-hidden group cursor-pointer">
+                  <img 
+                    src={location.images[0]} 
+                    alt={location.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary text-primary-foreground">
+                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                      </svg>
+                      Điểm du lịch
+                    </span>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                    <h4 className="font-bold mb-1 line-clamp-2">{location.name}</h4>
+                    <div className="flex items-center gap-2 text-xs text-white/90">
+                      <span>04/05/2024</span>
+                      <span>•</span>
+                      <span>1 min read</span>
+                      <span>•</span>
+                      <span>509 Views</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Destinations Grid */}
-        <DestinationGrid
-          destinations={filteredDestinations}
-          selectedCategory={selectedCategory}
-          searchQuery={searchQuery}
-        />
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Tất cả điểm đến</h2>
+          <DestinationGrid
+            destinations={filteredDestinations}
+            selectedCategory={selectedCategory}
+            searchQuery={searchQuery}
+          />
+        </div>
       </div>
     </div>
   );
