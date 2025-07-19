@@ -9,9 +9,9 @@ export const famousPlaces: LocationPoint[] = [
     coordinates: [106.2677, 17.5984], // Real coordinates for Phong Nha Cave
     description: 'A stunning underground river cave system, part of the UNESCO World Heritage Site. Famous for its spectacular stalactites and underground boat tours through crystal-clear waters.',
     images: [
-      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&h=600&fit=crop'
+      'https://cms.junglebosstours.com/assets/2c74649f-1ce7-49c8-a757-c98d275285e6?width=1202&height=802',
+      'https://bizweb.dktcdn.net/thumb/1024x1024/100/514/154/products/phong-nha-cave-quang-binh-tour-6-7f26838d-0d78-4ffa-98ea-66e51e0c24d4-0bd2a2d1-5b2f-4e2e-a865-337814b7fe80.jpg?v=1730984937283',
+      'https://culturephamtravel.com/wp-content/uploads/2024/11/Paradise-Cave-And-Phong-Nha-Cave-Tour-Culture-Pham-Travel-2.jpg'
     ],
     rating: 4.8,
     reviews: [
@@ -36,8 +36,8 @@ export const famousPlaces: LocationPoint[] = [
     coordinates: [106.2513, 17.5859], // Real coordinates for Paradise Cave
     description: 'One of the most spectacular dry caves in Asia, featuring magnificent stalactite and stalagmite formations that create an otherworldly paradise beneath the earth.',
     images: [
-      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
+      'https://ozoparkquangbinh.com/wp-content/uploads/2024/03/Paradise-Cave-And-Phong-Nha-Cave-Tour-Culture-OZO-Travel-31.png',
+      'https://www.pelago.com/img/products/VN-Vietnam/phong-nha-cave-paradise-cave-day-tour-small-group-to-fairy-land/dd05acc5-711a-4e7d-b7e7-e636b2beabb0_phong-nha-cave-paradise-cave-day-tour-small-group-to-fairy-land.jpg'
     ],
     rating: 4.9,
     reviews: [],
@@ -53,8 +53,8 @@ export const famousPlaces: LocationPoint[] = [
     coordinates: [106.2856, 17.5432], // Real coordinates for Mooc Spring
     description: 'A pristine natural spring with crystal-clear turquoise waters surrounded by lush tropical forest. Perfect for swimming and nature photography.',
     images: [
-      'https://images.unsplash.com/photo-1500673922987-e212871fec22?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800&h=600&fit=crop'
+      'https://celinaresort.com/wp-content/uploads/2021/03/phong-nha-suoi-mooc-06.jpg',
+      'https://sondoongcave.info/wp-content/uploads/2022/03/vui.jpg'
     ],
     rating: 4.7,
     reviews: [],
@@ -70,8 +70,8 @@ export const famousPlaces: LocationPoint[] = [
     coordinates: [106.6235, 17.4833], // Real coordinates for Nhat Le Beach
     description: 'A beautiful coastal stretch with golden sand and clear blue waters, perfect for sunset viewing and beach activities.',
     images: [
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1471101173712-b9884175254e?w=800&h=600&fit=crop'
+      'https://media-cdn.tripadvisor.com/media/photo-s/15/61/e4/82/c-a-song-nh-t-l-noi-dong.jpg',
+      'https://image.vietgoing.com/destination/large/vietgoing_lfp2103222205.webp'
     ],
     rating: 4.6,
     reviews: [],
@@ -87,7 +87,7 @@ export const famousPlaces: LocationPoint[] = [
     coordinates: [106.5987, 17.4567], // Real coordinates for Da Nhay Beach
     description: 'A secluded beach known for its unique rock formations and pristine natural beauty, ideal for those seeking tranquility.',
     images: [
-      'https://images.unsplash.com/photo-1471101173712-b9884175254e?w=800&h=600&fit=crop'
+      'https://dulichnewtour.vn/ckfinder/images/bien-da-nhay%20(4).jpg'
     ],
     rating: 4.5,
     reviews: [],
@@ -103,7 +103,7 @@ export const famousPlaces: LocationPoint[] = [
     coordinates: [106.6089, 17.4781], // Real coordinates for Dong Hoi Citadel
     description: 'Historical citadel ruins showcasing the rich cultural heritage of Quang Binh province with ancient architecture and historical significance.',
     images: [
-      'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=600&fit=crop'
+      'https://nads.1cdn.vn/2024/08/16/W_dji_0944-copy-2.jpg'
     ],
     rating: 4.3,
     reviews: [],
