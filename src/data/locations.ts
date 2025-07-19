@@ -122,8 +122,8 @@ export const craftVillages: LocationPoint[] = [
     coordinates: [106.5234, 17.6123], // Real coordinates for Lèn Thủy pottery
     description: 'Traditional pottery village famous for creating beautiful ceramic works using techniques passed down through generations.',
     images: [
-      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1636955816868-fcb881e57954?w=800&h=600&fit=crop'
+      'https://hcc.viettel.vn/upload/2000157/20190726/grabdc9563.jpg',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRy-RgkMnmYJQ2EzAk3TcJ06Qf0xk5c3-msyQ&s'
     ],
     rating: 4.6,
     reviews: [],
@@ -139,7 +139,7 @@ export const craftVillages: LocationPoint[] = [
     coordinates: [106.4567, 17.5678], // Real coordinates for Quang Phu mat weaving
     description: 'Renowned for traditional mat weaving using sedge plants, creating beautiful and durable floor mats with intricate patterns.',
     images: [
-      'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&h=600&fit=crop'
+      'https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/474632qWs/lang-nghe-det-chieu-chuong-hoa-hoai-nhon-binh-dinh-501921.jpg'
     ],
     rating: 4.4,
     reviews: [],
@@ -155,7 +155,7 @@ export const craftVillages: LocationPoint[] = [
     coordinates: [106.3456, 17.6234], // Real coordinates for Hien Ninh bamboo
     description: 'Specialized in bamboo craftsmanship, creating everything from household items to artistic decorations using sustainable bamboo.',
     images: [
-      'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&h=600&fit=crop'
+      'https://bazantravel.com/cdn/medias/uploads/30/30164-lang-nghe-dan-lat-700x478.jpg'
     ],
     rating: 4.5,
     reviews: [],
@@ -171,7 +171,7 @@ export const craftVillages: LocationPoint[] = [
     coordinates: [106.1234, 17.4567], // Real coordinates for Le Thuy rattan
     description: 'Master craftsmen creating beautiful rattan furniture and decorative items using traditional weaving techniques.',
     images: [
-      'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&h=600&fit=crop'
+      'https://pefso.com/wp-content/uploads/2024/04/305849882_490189949782619_3247358147554599112_n-1024x682.jpeg'
     ],
     rating: 4.3,
     reviews: [],
@@ -187,7 +187,7 @@ export const craftVillages: LocationPoint[] = [
     coordinates: [106.7234, 17.3456], // Real coordinates for Bao Ninh seafood
     description: 'Coastal village specializing in traditional seafood drying and processing, creating delicious preserved seafood products.',
     images: [
-      'https://images.unsplash.com/photo-1554998171-706976ef2e3d?w=800&h=600&fit=crop'
+      'https://cdn-i.vtcnews.vn/resize/th/upload/2024/05/29/ghe-tham-bien-bao-ninh-bai-bien-hoang-so-dep-nhat-quang-binh-22472563.jpg'
     ],
     rating: 4.2,
     reviews: [],
@@ -203,7 +203,7 @@ export const craftVillages: LocationPoint[] = [
     coordinates: [106.6678, 17.4123], // Real coordinates for Dong Hoi fish sauce
     description: 'Traditional fish sauce production village, creating premium fish sauce using age-old fermentation methods.',
     images: [
-      'https://images.unsplash.com/photo-1554998171-706976ef2e3d?w=800&h=600&fit=crop'
+      'https://quangbinhtravel.vn/wp-content/uploads/2024/09/nuoc-mam-bao-ninh.jpg'
     ],
     rating: 4.4,
     reviews: [],
