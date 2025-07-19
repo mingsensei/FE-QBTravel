@@ -4,32 +4,32 @@ import { mockItinerary } from '@/data/mockItinerary';
 import ItineraryList from './ItineraryList';
 import ItineraryDetails from './ItineraryDetails';
 import AddStopFlow from './AddStopFlow';
+import TravelPlannerAI from './chatbot/TravelPlanAI';
 
 const Itinerary: React.FC = () => {
-  const [currentView, setCurrentView] = useState<'list' | 'details' | 'addStop'>('list');
+  const [currentView, setCurrentView] = useState<'list' | 'details' | 'addStop' | 'aiPlanner'>('list');
   const [selectedItinerary, setSelectedItinerary] = useState<ItineraryType | null>(null);
   const [itineraries, setItineraries] = useState<ItineraryType[]>([mockItinerary]);
 
   const handleSelectItinerary = async (itinerary: ItineraryType) => {
-  try {
-    const res = await fetch(`http://localhost:8081/api/itinerary-stop/by-itinerary/${itinerary.id}`);
-    if (!res.ok) throw new Error('Failed to fetch stops');
+    try {
+      const res = await fetch(`http://localhost:8081/api/itinerary-stop/by-itinerary/${itinerary.id}`);
+      if (!res.ok) throw new Error('Failed to fetch stops');
 
-    const stops: ItineraryStop[] = await res.json();
+      const stops: ItineraryStop[] = await res.json();
 
-    const itineraryWithStops = {
-      ...itinerary,
-      stops: stops
-    };
+      const itineraryWithStops = {
+        ...itinerary,
+        stops: stops
+      };
 
-    setSelectedItinerary(itineraryWithStops);
-    setCurrentView('details');
-  } catch (error) {
-    console.error('Error fetching stops:', error);
-    alert('Không thể tải chi tiết hành trình');
-  }
-};
-
+      setSelectedItinerary(itineraryWithStops);
+      setCurrentView('details');
+    } catch (error) {
+      console.error('Error fetching stops:', error);
+      alert('Không thể tải chi tiết hành trình');
+    }
+  };
 
   const handleBackToList = () => {
     setCurrentView('list');
@@ -47,6 +47,11 @@ const Itinerary: React.FC = () => {
   const handleCreateNewItinerary = () => {
     // TODO: Implement create new itinerary flow
     console.log('Create new itinerary');
+  };
+
+  // NEW: Handle AI Planner
+  const handleOpenAIPlanner = () => {
+    setCurrentView('aiPlanner');
   };
 
   const handleAddStopToItinerary = (stop: Omit<ItineraryStop, 'id' | 'challenges' | 'posts'>) => {
@@ -118,6 +123,13 @@ const Itinerary: React.FC = () => {
         <AddStopFlow
           onBack={handleBackToDetails}
           onAddStop={handleAddStopToItinerary}
+        />
+      );
+    
+    case 'aiPlanner':
+      return (
+        <TravelPlannerAI
+          onBack={handleBackToList}
         />
       );
     
