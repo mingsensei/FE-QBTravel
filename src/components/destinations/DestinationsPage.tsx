@@ -5,6 +5,8 @@ import { DestinationFilters } from './DestinationFilters';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, MapPin, Compass } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import qbHeaderVideo from '@/assets/qbheader.webm';
+
 
 export const DestinationsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,37 +36,44 @@ export const DestinationsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-nature">
       {/* Header */}
-      <div className="bg-gradient-primary text-primary-foreground">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center gap-4 mb-6">
-            <Link to="/">
-              <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-white/10">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Trang chủ
-              </Button>
-            </Link>
-          </div>
-          
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
-              <Compass className="w-8 h-8" />
+      <div className="relative overflow-hidden min-h-[500px] pt-24">
+        {/* Video nền */}
+        <video
+            className="absolute inset-0 w-full h-full object-cover"
+            src={qbHeaderVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+        />
+        {/* Overlay mờ cho chữ nổi */}
+        <div className="absolute inset-0 bg-black/30"></div>
+        {/* Nội dung header */}
+        <div className="relative z-10">
+          <div className="container mx-auto px-4 py-8">
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
+                <Compass className="w-8 h-8 text-green-600" />
+              </div>
+
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold mb-2 text-white drop-shadow">
+                  Khám Phá Quảng Bình
+                </h1>
+                <p className="text-lg text-white/90">
+                  Những điểm đến tuyệt vời đang chờ đón bạn
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                Khám Phá Quảng Bình
-              </h1>
-              <p className="text-lg text-primary-foreground/90">
-                Những điểm đến tuyệt vời đang chờ đón bạn
-              </p>
+            <div className="flex items-center gap-2 text-white/80">
+              <MapPin className="w-4 h-4" />
+              <span>Tỉnh Quảng Bình, Việt Nam</span>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-2 text-primary-foreground/80">
-            <MapPin className="w-4 h-4" />
-            <span>Tỉnh Quảng Bình, Việt Nam</span>
           </div>
         </div>
       </div>
+
 
       {/* Content */}
       <div className="container mx-auto px-4 py-8">
