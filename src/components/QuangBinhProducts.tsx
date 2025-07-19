@@ -92,7 +92,7 @@ export const QuangBinhProducts: React.FC = () => {
                   onClick={handleCloseModal}
               />
               {/* Modal Card */}
-              <div className="relative z-10 max-w-lg w-full mx-4">
+              <div className="relative z-10 w-full sm:max-w-xl md:max-w-2xl lg:max-w-4xl mx-4">
                 {/* Close button */}
                 <button
                     onClick={handleCloseModal}
