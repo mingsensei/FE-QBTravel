@@ -1,24 +1,49 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { FeaturedProductsCarousel } from './FeaturedProductsCarousel';
 import { ProductFilter } from './ProductFilter';
 import { ProductGrid } from './ProductGrid';
 import { Product, ProductType } from '../types/Product';
-import { products } from '../data/products';
 
 export const QuangBinhProducts: React.FC = () => {
   const [selectedTypes, setSelectedTypes] = useState<ProductType[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch products from API
+  useEffect(() => {
+    setLoading(true);
+    // const token = localStorage.getItem('accessToken');
+    fetch('http://localhost:8081/api/products', {
+      method: 'GET',
+      headers: {
+        // 'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load products');
+        return res.json();
+      })
+      .then(data => {
+        setProducts(data);
+        setError(null);
+      })
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesType = selectedTypes.length === 0 || selectedTypes.includes(product.type);
-      
+      const matchesSearch =
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType =
+        selectedTypes.length === 0 || selectedTypes.includes(product.type as ProductType);
       return matchesSearch && matchesType;
     });
-  }, [searchTerm, selectedTypes]);
+  }, [searchTerm, selectedTypes, products]);
 
   const handleProductClick = (product: Product) => {
     // For now, just log the product. In a real app, this would navigate to product details
@@ -26,6 +51,22 @@ export const QuangBinhProducts: React.FC = () => {
     // You can replace this with actual navigation logic
     // For example: navigate(`/destination-blog/${product.id}`);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl text-primary">
+        Đang tải sản phẩm...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl text-red-600">
+        Lỗi: {error}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 pt-24">
@@ -38,7 +79,7 @@ export const QuangBinhProducts: React.FC = () => {
               Quang Binh Traditional Products
             </h1>
             <p className="text-xl text-green-100 mb-8">
-              Discover authentic handmade crafts and local specialties from the heart of Vietnam. 
+              Discover authentic handmade crafts and local specialties from the heart of Vietnam.
               Each product tells a story of tradition, skill, and cultural heritage.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
@@ -105,7 +146,7 @@ export const QuangBinhProducts: React.FC = () => {
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-2xl font-bold mb-4">Support Local Artisans</h3>
           <p className="text-green-200 max-w-2xl mx-auto mb-6">
-            Every purchase supports local communities and helps preserve traditional crafts 
+            Every purchase supports local communities and helps preserve traditional crafts
             that have been passed down through generations in Quang Binh province.
           </p>
           <div className="flex justify-center gap-8 text-sm">
