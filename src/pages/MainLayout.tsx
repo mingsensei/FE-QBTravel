@@ -9,7 +9,6 @@ export default function MainLayout() {
             <TourismHeader />
             <main>
                 <Outlet />
-                <ChatBot/>{/* Render child route tại đây */}
             </main>
             <TourismFooter />
         </>
