@@ -37,19 +37,20 @@ export interface ItineraryStop {
   notes?: string;
 }
 
+// types/itinerary.ts
 export interface Itinerary {
-  id: string;
+  id: number;
   title: string;
   description: string;
   startDate: string;
   endDate: string;
-  stops: ItineraryStop[];
-  createdAt: string;
-  updatedAt: string;
+  stops?: ItineraryStop[]; // <- optional stops
 }
+
 
 export interface UploadData {
   type: 'photo' | 'video';
   file: File;
   preview: string;
 }
+
